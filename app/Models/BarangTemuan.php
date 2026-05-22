@@ -9,33 +9,27 @@ class BarangTemuan extends Model
     protected $table = 'barang_temuan';
 
     protected $fillable = [
-        'user_id',
-        'nama_barang',
-        'deskripsi',
-        'kategori_id',
-        'lokasi_id',
-        'foto',
-        'status',
-        'diklaim_oleh'
+        'user_id', 'nama_barang', 'deskripsi',
+        'kategori_id', 'lokasi_id', 'foto',
+        'status', 'diklaim_oleh',
     ];
 
-    // RELASI
     public function user()
     {
-        return $this->belongsTo(User::class);
-    }
-
-    public function kategori()
-    {
-        return $this->belongsTo(KategoriBarang::class);
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     public function lokasi()
     {
-        return $this->belongsTo(Lokasi::class);
+        return $this->belongsTo(Lokasi::class, 'lokasi_id');
     }
 
-    public function diklaimOleh()
+    public function kategori()
+    {
+        return $this->belongsTo(KategoriBarang::class, 'kategori_id');
+    }
+
+    public function pemilikKlaim()
     {
         return $this->belongsTo(User::class, 'diklaim_oleh');
     }
