@@ -152,16 +152,26 @@
 
                     {{-- Badge Status --}}
                     @php
-                        $status = strtolower($barang->status ?? 'tersedia');
-                        $badgeBg = $status === 'diklaim' ? 'rgba(0,0,0,0.75)' : 'rgba(0,0,0,0.75)';
-                        $badgeLabel = $status === 'diklaim' ? 'Diklaim' : 'Tersedia';
-                    @endphp
-                    <span style="position: absolute; top: 10px; right: 10px;
-                                 background: rgba(0,0,0,0.72); color: white;
-                                 font-size: 0.75rem; font-weight: 600;
-                                 padding: 4px 10px; border-radius: 999px;">
-                        {{ $badgeLabel }}
-                    </span>
+                    $status = strtolower($barang->status ?? 'tersedia');
+                    $badgeLabel = match($status) {
+                        'diklaim'             => 'Diklaim',
+                        'menunggu_verifikasi' => 'Menunggu',
+                        'diarsipkan'          => 'Diarsipkan',
+                        default               => 'Tersedia',
+                    };
+                    $badgeBg = match($status) {
+                        'diklaim'             => 'rgba(55,65,81,0.85)',
+                        'menunggu_verifikasi' => 'rgba(217,119,6,0.85)',
+                        'diarsipkan'          => 'rgba(107,114,128,0.85)',
+                        default               => 'rgba(0,0,0,0.72)',
+                    };
+                @endphp
+                <span style="position: absolute; top: 10px; right: 10px;
+                            background: {{ $badgeBg }}; color: white;
+                            font-size: 0.75rem; font-weight: 600;
+                            padding: 4px 10px; border-radius: 999px;">
+                    {{ $badgeLabel }}
+                </span>
                 </div>
 
                 {{-- Info --}}

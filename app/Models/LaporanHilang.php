@@ -22,21 +22,21 @@ class LaporanHilang extends Model
 
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     public function kategori()
     {
-        return $this->belongsTo(KategoriBarang::class);
+        return $this->belongsTo(KategoriBarang::class, 'kategori_id');
     }
 
     public function lokasi()
     {
-        return $this->belongsTo(Lokasi::class);
+        return $this->belongsTo(Lokasi::class, 'lokasi_id');
     }
 
     public function barangTemuan()
     {
-        return $this->belongsTo(BarangTemuan::class);
+        return $this->belongsTo(BarangTemuan::class, 'barang_temuan_id');
     }
 }

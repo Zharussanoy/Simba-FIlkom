@@ -35,6 +35,7 @@ class BarangTemuanController extends Controller
             'lokasis'   => Lokasi::all(),
         ]);
     }
+    
 
     public function show($id)
     {
@@ -42,19 +43,30 @@ class BarangTemuanController extends Controller
         return view('barang.show', compact('barang'));
     }
 
-    public function klaim($id)
+    public function klaim(Request $request, $id)
     {
         $barang = BarangTemuan::findOrFail($id);
 
         if ($barang->status !== 'tersedia') {
-            return back()->with('error', 'Barang sudah tidak tersedia untuk diklaim.');
+            return redirect()->route('barang.show', $barang->id)
+                            ->with('error', 'Barang sudah tidak tersedia untuk diklaim.');
+        }
+
+        $request->validate([
+            'bukti_kepemilikan' => 'required|string|min:10',
+            'foto_bukti'        => 'nullable|image|max:2048',
+        ]);
+
+        if ($request->hasFile('foto_bukti')) {
+            $request->file('foto_bukti')->store('bukti-klaim', 'public');
         }
 
         $barang->update([
-            'status'      => 'diklaim',
+            'status'       => 'menunggu_verifikasi',
             'diklaim_oleh' => auth()->id(),
         ]);
 
-        return back()->with('success', 'Berhasil mengklaim barang!');
+        return redirect()->route('barang.show', $barang->id)
+                        ->with('success', 'Klaim berhasil diajukan! Petugas keamanan akan memverifikasi bukti Anda.');
     }
 }
