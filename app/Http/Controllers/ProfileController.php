@@ -2,59 +2,90 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\ProfileUpdateRequest;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Redirect;
-use Illuminate\View\View;
 
 class ProfileController extends Controller
 {
-    /**
-     * Display the user's profile form.
-     */
-    public function edit(Request $request): View
+    public function index()
     {
-        return view('profile.edit', [
-            'user' => $request->user(),
+        $user = auth()->user();
+
+        $aktivitas = collect();
+
+        $laporanHilang = \App\Models\LaporanHilang::where('user_id', $user->id)
+            ->latest()->take(5)->get();
+
+        foreach ($laporanHilang as $l) {
+            $aktivitas->push([
+                'aksi'   => 'Melaporkan barang hilang',
+                'nama'   => $l->judul,
+                'waktu'  => \Carbon\Carbon::parse($l->created_at)->format('Y-m-d H:i'),
+                'status' => match($l->status) {
+                    'ditemukan' => 'Selesai',
+                    'menunggu'  => 'Pending',
+                    default     => ucfirst($l->status),
+                },
+            ]);
+        }
+
+        $klaim = \App\Models\BarangTemuan::where('diklaim_oleh', $user->id)
+            ->latest()->take(5)->get();
+
+        foreach ($klaim as $k) {
+            $aktivitas->push([
+                'aksi'   => 'Mengklaim barang',
+                'nama'   => $k->nama_barang,
+                'waktu'  => \Carbon\Carbon::parse($k->updated_at)->format('Y-m-d H:i'),
+                'status' => match($k->status) {
+                    'diklaim'             => 'Selesai',
+                    'menunggu_verifikasi' => 'Pending',
+                    default               => ucfirst($k->status),
+                },
+            ]);
+        }
+
+        $aktivitas = $aktivitas->sortByDesc('waktu')->take(5)->values();
+
+        return view('profile.index', [
+            'user'           => $user,
+            'totalLaporan'   => \App\Models\LaporanHilang::where('user_id', $user->id)->count(),
+            'totalDitemukan' => \App\Models\LaporanHilang::where('user_id', $user->id)->where('status', 'ditemukan')->count(),
+            'totalPending'   => \App\Models\LaporanHilang::where('user_id', $user->id)->where('status', 'menunggu')->count(),
+            'aktivitas'      => $aktivitas,
         ]);
     }
 
-    /**
-     * Update the user's profile information.
-     */
-    public function update(ProfileUpdateRequest $request): RedirectResponse
+    public function update(Request $request)
     {
-        $request->user()->fill($request->validated());
+        $request->validate([
+            'name'         => 'required|string|max:255',
+            'nim'          => 'nullable|string|max:20',
+            'nomor_kontak' => 'nullable|string|max:20',
+            'fakultas'     => 'nullable|string|max:255',
+            'prodi'        => 'nullable|string|max:255',
+        ]);
 
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
-        }
+        auth()->user()->update($request->only([
+            'name', 'nim', 'nomor_kontak', 'fakultas', 'prodi'
+        ]));
 
-        $request->user()->save();
-
-        return Redirect::route('profile.edit')->with('status', 'profile-updated');
+        return redirect()->route('profile.index')
+                         ->with('success', 'Profil berhasil diperbarui!');
     }
 
-    /**
-     * Delete the user's account.
-     */
-    public function destroy(Request $request): RedirectResponse
+    public function destroy(Request $request)
     {
         $request->validateWithBag('userDeletion', [
             'password' => ['required', 'current_password'],
         ]);
 
         $user = $request->user();
-
-        Auth::logout();
-
+        auth()->logout();
         $user->delete();
 
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return Redirect::to('/');
+        return redirect('/');
     }
 }

@@ -15,6 +15,9 @@ class User extends Authenticatable
         'email',
         'password',
         'nim',
+        'nomor_kontak',
+        'fakultas',
+        'prodi',
         'role'
     ];
 
