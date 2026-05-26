@@ -25,7 +25,7 @@ Route::get('/barang/{id}', [BarangTemuanController::class, 'show'])
 */
 Route::middleware(['auth'])->group(function () {
 
-    // Dashboard
+    // Dashboard — satu route, controller cek role sendiri
     Route::get('/dashboard', [DashboardController::class, 'index'])
         ->name('dashboard');
 
@@ -41,7 +41,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/laporan/{id}', [LaporanHilangController::class, 'show'])
         ->name('laporan.show');
 
-    // Profile — pakai path berbeda agar tidak bentrok dengan auth.php Breeze
+    // Profile
     Route::get('/profil-saya', [ProfileController::class, 'index'])
         ->name('profile.index');
     Route::patch('/profil-saya', [ProfileController::class, 'update'])
@@ -49,7 +49,7 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/profil-saya', [ProfileController::class, 'destroy'])
         ->name('profile.destroy');
 
-    // Security
+    // Security — path terpisah /security/dashboard
     Route::prefix('security')->name('security.')->group(function () {
         Route::get('/dashboard', [SecurityController::class, 'index'])
             ->name('dashboard');
