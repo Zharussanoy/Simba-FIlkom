@@ -132,9 +132,9 @@
     <div style="background: #f3f4f6; border-radius: 12px; padding: 4px;
                 display: flex; gap: 4px; margin-bottom: 20px;">
         @foreach([
-            ['key' => 'laporan',     'label' => 'Laporan Hilang',    'count' => $laporans->count()],
-            ['key' => 'barang',      'label' => 'Barang Temuan',     'count' => $barangs->count()],
-            ['key' => 'verifikasi',  'label' => 'Verifikasi Klaim',  'count' => $klaimPending->count()],
+            ['key' => 'laporan',    'label' => 'Laporan Hilang',   'count' => $laporans->count()],
+            ['key' => 'barang',     'label' => 'Barang Temuan',    'count' => $barangs->count()],
+            ['key' => 'verifikasi', 'label' => 'Verifikasi Klaim', 'count' => $klaimPending->count()],
         ] as $t)
             <button onclick="switchTab('{{ $t['key'] }}')"
                     id="tab-btn-{{ $t['key'] }}"
@@ -148,48 +148,103 @@
 
     {{-- TAB: LAPORAN HILANG --}}
     <div id="tab-laporan" style="display: {{ $tab === 'laporan' ? 'block' : 'none' }};">
-        <div style="display: flex; flex-direction: column; gap: 12px;">
-            @forelse($laporans as $laporan)
-                <div style="background: white; border: 1px solid #e5e7eb; border-radius: 16px; padding: 20px;">
-                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+        <div style="background: white; border: 1px solid #e5e7eb; border-radius: 16px; overflow: hidden;">
+
+            <div style="padding: 16px 20px; border-bottom: 1px solid #f3f4f6;
+                        display: flex; justify-content: space-between; align-items: center;">
+                <h3 style="font-size: 0.9375rem; font-weight: 700; color: #111827; margin: 0;">
+                    Database Laporan Barang Hilang
+                </h3>
+                <div style="position: relative;">
+                    <svg style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
+                                width: 14px; height: 14px;" fill="none" stroke="#9ca3af" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"/>
+                    </svg>
+                    <input type="text" placeholder="Cari laporan..."
+                           oninput="filterLaporan(this.value)"
+                           style="padding: 8px 12px 8px 30px; border: 1px solid #e5e7eb;
+                                  border-radius: 8px; font-size: 0.8125rem; outline: none; width: 200px;"
+                           onfocus="this.style.borderColor='#2563eb'"
+                           onblur="this.style.borderColor='#e5e7eb'">
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 130px 1fr 160px 120px 50px;
+                        padding: 12px 20px; background: #f9fafb; border-bottom: 1px solid #f3f4f6;">
+                @foreach(['Kode','Barang','Pelapor','Status','Aksi'] as $h)
+                    <p style="font-size: 0.75rem; font-weight: 600; color: #6b7280; margin: 0;">{{ $h }}</p>
+                @endforeach
+            </div>
+
+            <div id="laporan-list">
+                @forelse($laporans as $laporan)
+                    @php
+                        $ls = strtolower($laporan->status ?? 'menunggu');
+                        $lBadge = match($ls) {
+                            'ditemukan'  => 'background:#dcfce7; color:#16a34a;',
+                            'disetujui'  => 'background:#dbeafe; color:#2563eb;',
+                            'ditutup'    => 'background:#111827; color:white;',
+                            default      => 'background:#fee2e2; color:#dc2626;',
+                        };
+                        $lLabel = match($ls) {
+                            'ditemukan'  => 'Dikembalikan',
+                            'disetujui'  => 'Ditemukan',
+                            'ditutup'    => 'Ditutup',
+                            default      => 'Dicari',
+                        };
+                    @endphp
+                    <div class="laporan-row"
+                         data-nama="{{ strtolower($laporan->judul) }}"
+                         style="display: grid; grid-template-columns: 130px 1fr 160px 120px 50px;
+                                padding: 14px 20px; border-bottom: 1px solid #f9fafb; align-items: center;">
+
+                        <p style="font-size: 0.75rem; color: #9ca3af; margin: 0; font-family: monospace;">
+                            LOST-{{ date('Y') }}-{{ str_pad($laporan->id, 3, '0', STR_PAD_LEFT) }}
+                        </p>
+
                         <div>
-                            <h3 style="font-size: 1rem; font-weight: 700; color: #111827; margin: 0 0 4px 0;">
+                            <p style="font-size: 0.875rem; font-weight: 600; color: #111827; margin: 0 0 2px 0;">
                                 {{ $laporan->judul }}
-                            </h3>
-                            <p style="font-size: 0.8125rem; color: #6b7280; margin: 0 0 2px 0;">
-                                Dilaporkan oleh: <strong style="color: #374151;">{{ $laporan->user->name ?? '-' }}</strong>
                             </p>
                             <p style="font-size: 0.75rem; color: #9ca3af; margin: 0;">
-                                {{ $laporan->kategori->nama ?? '-' }} •
-                                {{ $laporan->lokasi->nama ?? '-' }} •
-                                {{ \Carbon\Carbon::parse($laporan->tanggal_hilang)->format('Y-m-d') }}
+                                {{ $laporan->kategori->nama ?? '-' }}
                             </p>
                         </div>
-                        @php
-                            $ls = $laporan->status;
-                            $lBg = match($ls) {
-                                'ditemukan' => '#dcfce7; color: #16a34a',
-                                'menunggu'  => '#f3f4f6; color: #374151',
-                                default     => '#fef3c7; color: #d97706',
-                            };
-                        @endphp
-                        <span style="font-size: 0.75rem; font-weight: 600; padding: 4px 12px;
-                                     border-radius: 999px; background: {{ $lBg }}; white-space: nowrap;">
-                            {{ ucfirst($ls) }}
+
+                        <div>
+                            <p style="font-size: 0.875rem; color: #374151; margin: 0 0 2px 0;">
+                                {{ $laporan->user->name ?? '-' }}
+                            </p>
+                            <p style="font-size: 0.75rem; color: #9ca3af; margin: 0;">
+                                {{ $laporan->user->nim ?? '-' }}
+                            </p>
+                        </div>
+
+                        <span style="font-size: 0.75rem; font-weight: 600; padding: 4px 10px;
+                                     border-radius: 999px; {{ $lBadge }}">
+                            {{ $lLabel }}
                         </span>
+
+                        <button onclick="openDetailLaporan({{ $laporan->id }})"
+                                style="background: none; border: none; cursor: pointer;
+                                       color: #9ca3af; padding: 4px;"
+                                onmouseover="this.style.color='#374151'"
+                                onmouseout="this.style.color='#9ca3af'">
+                            <svg style="width: 18px; height: 18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                            </svg>
+                        </button>
                     </div>
-                    @if($laporan->deskripsi)
-                        <p style="font-size: 0.8125rem; color: #6b7280; line-height: 1.6; margin: 0;
-                                  padding-top: 12px; border-top: 1px solid #f3f4f6;">
-                            {{ Str::limit($laporan->deskripsi, 120) }}
-                        </p>
-                    @endif
-                </div>
-            @empty
-                <div style="text-align: center; padding: 48px; color: #9ca3af;">
-                    <p style="font-size: 0.875rem;">Tidak ada laporan hilang</p>
-                </div>
-            @endforelse
+                @empty
+                    <div style="padding: 40px; text-align: center;">
+                        <p style="color: #9ca3af; font-size: 0.875rem;">Belum ada laporan</p>
+                    </div>
+                @endforelse
+            </div>
         </div>
     </div>
 
@@ -197,7 +252,6 @@
     <div id="tab-barang" style="display: {{ $tab === 'barang' ? 'block' : 'none' }};">
         <div style="background: white; border: 1px solid #e5e7eb; border-radius: 16px; overflow: hidden;">
 
-            {{-- Search --}}
             <div style="padding: 16px 20px; border-bottom: 1px solid #f3f4f6;
                         display: flex; justify-content: space-between; align-items: center;">
                 <h3 style="font-size: 0.9375rem; font-weight: 700; color: #111827; margin: 0;">
@@ -218,7 +272,6 @@
                 </div>
             </div>
 
-            {{-- Table header --}}
             <div style="display: grid; grid-template-columns: 140px 1fr 120px 110px 50px;
                         padding: 12px 20px; background: #f9fafb; border-bottom: 1px solid #f3f4f6;">
                 @foreach(['Kode','Barang','Kategori','Status','Aksi'] as $h)
@@ -226,21 +279,37 @@
                 @endforeach
             </div>
 
-            {{-- Table rows --}}
             <div id="barang-list">
                 @forelse($barangs as $b)
+                    @php
+                        $bs = strtolower($b->status ?? 'tersedia');
+                        $bBadge = match($bs) {
+                            'tersedia'            => 'background:#111827; color:white;',
+                            'diklaim'             => 'background:#f3f4f6; color:#374151; border:1px solid #e5e7eb;',
+                            'menunggu_verifikasi' => 'background:#fef3c7; color:#d97706;',
+                            default               => 'background:#f3f4f6; color:#374151;',
+                        };
+                        $bLabel = match($bs) {
+                            'tersedia'            => 'Tersedia',
+                            'diklaim'             => 'Diklaim',
+                            'menunggu_verifikasi' => 'Menunggu',
+                            default               => ucfirst($bs),
+                        };
+                    @endphp
                     <div class="barang-row"
                          data-nama="{{ strtolower($b->nama_barang) }}"
                          style="display: grid; grid-template-columns: 140px 1fr 120px 110px 50px;
-                                padding: 14px 20px; border-bottom: 1px solid #f9fafb;
-                                align-items: center;">
+                                padding: 14px 20px; border-bottom: 1px solid #f9fafb; align-items: center;">
+
                         <p style="font-size: 0.75rem; color: #9ca3af; margin: 0; font-family: monospace;">
                             SIMBA-{{ date('Y') }}-{{ str_pad($b->id, 3, '0', STR_PAD_LEFT) }}
                         </p>
+
                         <div style="display: flex; align-items: center; gap: 10px;">
                             @if($b->foto)
                                 <img src="{{ Storage::url($b->foto) }}"
-                                     style="width: 36px; height: 36px; border-radius: 8px; object-fit: cover; flex-shrink: 0;">
+                                     style="width: 36px; height: 36px; border-radius: 8px;
+                                            object-fit: cover; flex-shrink: 0;">
                             @else
                                 <div style="width: 36px; height: 36px; border-radius: 8px;
                                             background: #f3f4f6; flex-shrink: 0;"></div>
@@ -249,26 +318,16 @@
                                 {{ $b->nama_barang }}
                             </p>
                         </div>
-                        <p style="font-size: 0.8125rem; color: #6b7280; margin: 0;">{{ $b->kategori->nama ?? '-' }}</p>
-                        @php
-                            $bs = strtolower($b->status ?? 'tersedia');
-                            $bBadge = match($bs) {
-                                'tersedia'            => 'background:#111827; color:white;',
-                                'diklaim'             => 'background:#f3f4f6; color:#374151; border:1px solid #e5e7eb;',
-                                'menunggu_verifikasi' => 'background:#fef3c7; color:#d97706;',
-                                default               => 'background:#f3f4f6; color:#374151;',
-                            };
-                            $bLabel = match($bs) {
-                                'tersedia'            => 'Tersedia',
-                                'diklaim'             => 'Diklaim',
-                                'menunggu_verifikasi' => 'Menunggu',
-                                default               => ucfirst($bs),
-                            };
-                        @endphp
+
+                        <p style="font-size: 0.8125rem; color: #6b7280; margin: 0;">
+                            {{ $b->kategori->nama ?? '-' }}
+                        </p>
+
                         <span style="font-size: 0.75rem; font-weight: 600; padding: 4px 10px;
                                      border-radius: 999px; {{ $bBadge }}">
                             {{ $bLabel }}
                         </span>
+
                         <a href="{{ route('barang.show', $b->id) }}"
                            style="color: #9ca3af; display: flex; align-items: center;"
                            onmouseover="this.style.color='#374151'"
@@ -296,7 +355,6 @@
             @forelse($klaimPending as $klaim)
                 <div style="background: white; border: 1px solid #e5e7eb; border-radius: 16px; padding: 24px;">
 
-                    {{-- Header klaim --}}
                     <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;">
                         <div>
                             <h3 style="font-size: 1.0625rem; font-weight: 700; color: #111827; margin: 0 0 4px 0;">
@@ -317,8 +375,8 @@
                             </p>
                         </div>
                         <span style="font-size: 0.75rem; font-weight: 600; padding: 5px 12px;
-                                     border-radius: 999px; background: #f3f4f6; color: #374151;
-                                     border: 1px solid #e5e7eb; display: flex; align-items: center; gap: 5px;">
+                                     border-radius: 999px; background: #fef3c7; color: #d97706;
+                                     display: flex; align-items: center; gap: 5px;">
                             <svg style="width: 12px; height: 12px;" fill="none" stroke="#f59e0b" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                       d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
@@ -327,7 +385,6 @@
                         </span>
                     </div>
 
-                    {{-- Foto & Bukti --}}
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
                         <div>
                             <p style="font-size: 0.8125rem; font-weight: 600; color: #374151; margin: 0 0 10px 0;">
@@ -355,33 +412,27 @@
                             <div style="width: 100%; min-height: 200px; background: #f9fafb;
                                         border-radius: 12px; border: 1px solid #e5e7eb; padding: 16px;
                                         box-sizing: border-box;">
-                                <p style="font-size: 0.8125rem; font-weight: 600; color: #374151; margin: 0 0 8px 0;">
-                                    Deskripsi:
-                                </p>
                                 <p style="font-size: 0.8125rem; color: #6b7280; line-height: 1.7; margin: 0;">
-                                    {{ $klaim->deskripsi ?? 'Tidak ada deskripsi tambahan' }}
+                                    {{ $klaim->deskripsi ?? 'Tidak ada deskripsi' }}
                                 </p>
                             </div>
                         </div>
                     </div>
 
-                    {{-- Tombol aksi --}}
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-                        <form method="POST" action="{{ route('security.klaim.setujui', $klaim->id) }}">
-                            @csrf
-                            <button type="submit"
-                                    style="width: 100%; padding: 13px; background: #111827; color: white;
-                                           font-size: 0.9375rem; font-weight: 700; border: none;
-                                           border-radius: 12px; cursor: pointer; display: flex;
-                                           align-items: center; justify-content: center; gap: 8px;"
-                                    onmouseover="this.style.background='#374151'"
-                                    onmouseout="this.style.background='#111827'">
-                                <svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                </svg>
-                                Setujui Klaim
-                            </button>
-                        </form>
+                        <button onclick="openSetujuiModal({{ $klaim->id }})"
+                                style="width: 100%; padding: 13px; background: #111827; color: white;
+                                       font-size: 0.9375rem; font-weight: 700; border: none;
+                                       border-radius: 12px; cursor: pointer; display: flex;
+                                       align-items: center; justify-content: center; gap: 8px;"
+                                onmouseover="this.style.background='#374151'"
+                                onmouseout="this.style.background='#111827'">
+                            <svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            Setujui Klaim
+                        </button>
                         <form method="POST" action="{{ route('security.klaim.tolak', $klaim->id) }}">
                             @csrf
                             <button type="submit"
@@ -392,13 +443,13 @@
                                     onmouseover="this.style.background='#dc2626'"
                                     onmouseout="this.style.background='#ef4444'">
                                 <svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                          d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                 </svg>
                                 Tolak Klaim
                             </button>
                         </form>
                     </div>
-
                 </div>
             @empty
                 <div style="text-align: center; padding: 60px; background: white;
@@ -411,11 +462,11 @@
 
 </div>
 
-{{-- MODAL INPUT BARANG TEMUAN --}}
+{{-- ===== MODAL INPUT BARANG TEMUAN ===== --}}
 <div id="modal-input"
      style="display: none; position: fixed; inset: 0; z-index: 100;
             background: rgba(0,0,0,0.5); align-items: center; justify-content: center; padding: 24px;"
-     onclick="if(event.target===this) document.getElementById('modal-input').style.display='none'">
+     onclick="if(event.target===this) this.style.display='none'">
 
     <div style="background: white; border-radius: 20px; padding: 28px;
                 width: 100%; max-width: 480px; max-height: 85vh; overflow-y: auto;">
@@ -433,10 +484,12 @@
             @csrf
 
             <div style="margin-bottom: 14px;">
-                <label style="display: block; font-size: 0.875rem; font-weight: 600; color: #111827; margin-bottom: 6px;">
+                <label style="display: block; font-size: 0.875rem; font-weight: 600;
+                              color: #111827; margin-bottom: 6px;">
                     Nama Barang <span style="color: #ef4444;">*</span>
                 </label>
-                <input type="text" name="nama_barang" placeholder="Contoh: Kunci Motor Honda Beat" required
+                <input type="text" name="nama_barang" required
+                       placeholder="Contoh: Kunci Motor Honda Beat"
                        style="width: 100%; padding: 11px 14px; border: 1px solid #e5e7eb;
                               border-radius: 10px; font-size: 0.875rem; outline: none;
                               box-sizing: border-box; background: #f9fafb;"
@@ -446,7 +499,8 @@
 
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px;">
                 <div>
-                    <label style="display: block; font-size: 0.875rem; font-weight: 600; color: #111827; margin-bottom: 6px;">
+                    <label style="display: block; font-size: 0.875rem; font-weight: 600;
+                                  color: #111827; margin-bottom: 6px;">
                         Kategori <span style="color: #ef4444;">*</span>
                     </label>
                     <select name="kategori_id" required
@@ -462,7 +516,8 @@
                     </select>
                 </div>
                 <div>
-                    <label style="display: block; font-size: 0.875rem; font-weight: 600; color: #111827; margin-bottom: 6px;">
+                    <label style="display: block; font-size: 0.875rem; font-weight: 600;
+                                  color: #111827; margin-bottom: 6px;">
                         Lokasi <span style="color: #ef4444;">*</span>
                     </label>
                     <select name="lokasi_id" required
@@ -480,7 +535,8 @@
             </div>
 
             <div style="margin-bottom: 14px;">
-                <label style="display: block; font-size: 0.875rem; font-weight: 600; color: #111827; margin-bottom: 6px;">
+                <label style="display: block; font-size: 0.875rem; font-weight: 600;
+                              color: #111827; margin-bottom: 6px;">
                     Deskripsi <span style="color: #ef4444;">*</span>
                 </label>
                 <textarea name="deskripsi" rows="3" required
@@ -493,9 +549,8 @@
             </div>
 
             <div style="margin-bottom: 24px;">
-                <label style="display: block; font-size: 0.875rem; font-weight: 600; color: #111827; margin-bottom: 6px;">
-                    Foto Barang
-                </label>
+                <label style="display: block; font-size: 0.875rem; font-weight: 600;
+                              color: #111827; margin-bottom: 6px;">Foto Barang</label>
                 <label for="foto-input" id="foto-upload-area"
                        style="display: flex; flex-direction: column; align-items: center; gap: 6px;
                               padding: 20px; border: 2px dashed #d1d5db; border-radius: 10px;
@@ -533,6 +588,234 @@
     </div>
 </div>
 
+{{-- ===== MODAL SETUJUI KLAIM ===== --}}
+<div id="modal-setujui"
+     style="display: none; position: fixed; inset: 0; z-index: 100;
+            background: rgba(0,0,0,0.5); align-items: center; justify-content: center; padding: 24px;"
+     onclick="if(event.target===this) this.style.display='none'">
+
+    <div style="background: white; border-radius: 20px; padding: 28px;
+                width: 100%; max-width: 460px; max-height: 85vh; overflow-y: auto;">
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <h2 style="font-size: 1.125rem; font-weight: 700; color: #111827; margin: 0;">Setujui Klaim</h2>
+            <button onclick="document.getElementById('modal-setujui').style.display='none'"
+                    style="background: #f3f4f6; border: none; cursor: pointer; color: #6b7280;
+                           width: 28px; height: 28px; border-radius: 999px; font-size: 0.875rem;">✕</button>
+        </div>
+        <p style="font-size: 0.8125rem; color: #6b7280; margin: 0 0 24px 0;">Isi data penyerahan barang</p>
+
+        <form id="form-setujui" method="POST" action="" enctype="multipart/form-data">
+            @csrf
+
+            <div style="margin-bottom: 16px;">
+                <label style="display: block; font-size: 0.875rem; font-weight: 600;
+                              color: #111827; margin-bottom: 6px;">
+                    Petugas Penyerah Barang <span style="color: #ef4444;">*</span>
+                </label>
+                <input type="text" name="petugas_penyerah" required
+                       placeholder="Nama petugas yang menyerahkan barang"
+                       style="width: 100%; padding: 11px 14px; border: 1px solid #e5e7eb;
+                              border-radius: 10px; font-size: 0.875rem; outline: none;
+                              box-sizing: border-box; background: #f9fafb;"
+                       onfocus="this.style.borderColor='#2563eb'; this.style.background='white'"
+                       onblur="this.style.borderColor='#e5e7eb'; this.style.background='#f9fafb'">
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; font-size: 0.875rem; font-weight: 600;
+                              color: #111827; margin-bottom: 6px;">
+                    Foto Bukti Penyerahan
+                </label>
+                <label for="foto-penyerahan" id="upload-penyerahan"
+                       style="display: flex; flex-direction: column; align-items: center; gap: 6px;
+                              padding: 20px; border: 2px dashed #d1d5db; border-radius: 10px;
+                              cursor: pointer; background: #f9fafb;"
+                       onmouseover="this.style.borderColor='#2563eb'"
+                       onmouseout="this.style.borderColor='#d1d5db'">
+                    <svg style="width: 24px; height: 24px;" fill="none" stroke="#9ca3af" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                              d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
+                    </svg>
+                    <span style="font-size: 0.8125rem; font-weight: 600; color: #2563eb;">Upload foto</span>
+                    <span id="foto-penyerahan-label" style="font-size: 0.75rem; color: #9ca3af;">
+                        Foto saat penyerahan barang
+                    </span>
+                    <input type="file" id="foto-penyerahan" name="foto_penyerahan" accept="image/*"
+                           style="display: none;" onchange="previewPenyerahan(this)">
+                </label>
+                <div id="preview-penyerahan-wrap" style="display: none; margin-top: 10px; position: relative;">
+                    <img id="preview-penyerahan"
+                         style="width: 100%; max-height: 160px; object-fit: cover;
+                                border-radius: 10px; border: 1px solid #e5e7eb;">
+                    <button type="button" onclick="hapusPenyerahan()"
+                            style="position: absolute; top: 8px; right: 8px; background: rgba(0,0,0,0.6);
+                                   border: none; color: white; border-radius: 999px; width: 24px;
+                                   height: 24px; cursor: pointer; font-size: 0.75rem;">✕</button>
+                </div>
+            </div>
+
+            <div style="background: #eff6ff; border-radius: 10px; padding: 14px 16px; margin-bottom: 24px;">
+                <p style="font-size: 0.8125rem; color: #1e40af; line-height: 1.7; margin: 0;">
+                    <strong>Setelah disetujui:</strong><br>
+                    - Status barang akan diubah menjadi "Diklaim"<br>
+                    - Mahasiswa akan menerima notifikasi<br>
+                    - Data penyerahan akan tercatat dalam sistem
+                </p>
+            </div>
+
+            <div style="display: flex; gap: 12px;">
+                <button type="submit"
+                        style="flex: 1; padding: 13px; background: #111827; color: white;
+                               font-size: 0.9375rem; font-weight: 700; border: none;
+                               border-radius: 12px; cursor: pointer;"
+                        onmouseover="this.style.background='#374151'"
+                        onmouseout="this.style.background='#111827'">
+                    Setujui
+                </button>
+                <button type="button"
+                        onclick="document.getElementById('modal-setujui').style.display='none'"
+                        style="padding: 13px 20px; background: none; border: none;
+                               font-size: 0.9375rem; color: #374151; cursor: pointer; font-weight: 500;">
+                    Batal
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{{-- ===== MODAL DETAIL LAPORAN ===== --}}
+<div id="modal-detail-laporan"
+     style="display: none; position: fixed; inset: 0; z-index: 100;
+            background: rgba(0,0,0,0.5); align-items: center; justify-content: center; padding: 24px;"
+     onclick="if(event.target===this) this.style.display='none'">
+
+    <div style="background: white; border-radius: 20px; width: 100%; max-width: 520px;
+                max-height: 88vh; overflow-y: auto;">
+
+        <div style="padding: 20px 24px 16px; border-bottom: 1px solid #f3f4f6;
+                    display: flex; justify-content: space-between; align-items: center;
+                    position: sticky; top: 0; background: white; z-index: 10;
+                    border-radius: 20px 20px 0 0;">
+            <div>
+                <h2 style="font-size: 1rem; font-weight: 700; color: #111827; margin: 0 0 2px 0;">
+                    Detail Laporan Barang Hilang
+                </h2>
+                <p id="detail-kode" style="font-size: 0.75rem; color: #9ca3af; margin: 0;"></p>
+            </div>
+            <button onclick="document.getElementById('modal-detail-laporan').style.display='none'; document.body.style.overflow='';"
+                    style="background: #f3f4f6; border: none; cursor: pointer; color: #6b7280;
+                           width: 28px; height: 28px; border-radius: 999px; font-size: 0.875rem; flex-shrink: 0;">✕</button>
+        </div>
+
+        <div style="padding: 20px 24px;">
+
+            <div id="detail-foto-wrap" style="margin-bottom: 20px;"></div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 20px;">
+
+                <div>
+                    <p style="font-size: 0.8125rem; font-weight: 700; color: #111827; margin: 0 0 12px 0;">📦 Data Barang</p>
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                        <div>
+                            <p style="font-size: 0.6875rem; color: #9ca3af; margin: 0 0 2px 0;">Nama Barang</p>
+                            <p id="detail-nama" style="font-size: 0.8125rem; font-weight: 600; color: #111827; margin: 0;"></p>
+                        </div>
+                        <div>
+                            <p style="font-size: 0.6875rem; color: #9ca3af; margin: 0 0 2px 0;">Kategori</p>
+                            <p id="detail-kategori" style="font-size: 0.8125rem; color: #374151; margin: 0;"></p>
+                        </div>
+                        <div>
+                            <p style="font-size: 0.6875rem; color: #9ca3af; margin: 0 0 2px 0;">Deskripsi</p>
+                            <p id="detail-deskripsi" style="font-size: 0.8125rem; color: #374151; margin: 0; line-height: 1.5;"></p>
+                        </div>
+                        <div>
+                            <p style="font-size: 0.6875rem; color: #9ca3af; margin: 0 0 4px 0;">Status</p>
+                            <span id="detail-status-badge"
+                                  style="font-size: 0.75rem; font-weight: 600; padding: 3px 10px;
+                                         border-radius: 999px; display: inline-block;"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <p style="font-size: 0.8125rem; font-weight: 700; color: #111827; margin: 0 0 12px 0;">👤 Data Pelapor</p>
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                        <div>
+                            <p style="font-size: 0.6875rem; color: #9ca3af; margin: 0 0 2px 0;">Nama Pelapor</p>
+                            <p id="detail-pelapor" style="font-size: 0.8125rem; font-weight: 600; color: #111827; margin: 0;"></p>
+                        </div>
+                        <div>
+                            <p style="font-size: 0.6875rem; color: #9ca3af; margin: 0 0 2px 0;">NIM</p>
+                            <p id="detail-nim" style="font-size: 0.8125rem; color: #374151; margin: 0;"></p>
+                        </div>
+                        <div>
+                            <p style="font-size: 0.6875rem; color: #9ca3af; margin: 0 0 2px 0;">Kontak</p>
+                            <p id="detail-kontak" style="font-size: 0.8125rem; color: #374151; margin: 0;"></p>
+                        </div>
+                        <div>
+                            <p style="font-size: 0.6875rem; color: #9ca3af; margin: 0 0 2px 0;">Tanggal Lapor</p>
+                            <p id="detail-tanggal-lapor" style="font-size: 0.8125rem; color: #374151; margin: 0;"></p>
+                        </div>
+                        <div>
+                            <p style="font-size: 0.6875rem; color: #9ca3af; margin: 0 0 2px 0;">Petugas Penerima</p>
+                            <p id="detail-petugas-terima" style="font-size: 0.8125rem; color: #374151; margin: 0;"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <p style="font-size: 0.8125rem; font-weight: 700; color: #111827; margin: 0 0 12px 0;">📍 Lokasi & Waktu</p>
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                        <div>
+                            <p style="font-size: 0.6875rem; color: #9ca3af; margin: 0 0 2px 0;">Tempat Kehilangan</p>
+                            <p id="detail-lokasi" style="font-size: 0.8125rem; font-weight: 600; color: #111827; margin: 0;"></p>
+                        </div>
+                        <div>
+                            <p style="font-size: 0.6875rem; color: #9ca3af; margin: 0 0 2px 0;">Tanggal Hilang</p>
+                            <p id="detail-tanggal-hilang" style="font-size: 0.8125rem; color: #374151; margin: 0;"></p>
+                        </div>
+                        <div>
+                            <p style="font-size: 0.6875rem; color: #9ca3af; margin: 0 0 2px 0;">Ditemukan Oleh</p>
+                            <p id="detail-ditemukan-oleh" style="font-size: 0.8125rem; color: #374151; margin: 0;"></p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            {{-- Data Pengembalian --}}
+            <div id="detail-pengembalian"
+                 style="display: none; border-top: 1px solid #f3f4f6; padding-top: 16px; margin-bottom: 16px;">
+                <p style="font-size: 0.8125rem; font-weight: 700; color: #111827; margin: 0 0 12px 0;">
+                    ✅ Data Pengembalian
+                </p>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+                    <div>
+                        <p style="font-size: 0.6875rem; color: #9ca3af; margin: 0 0 2px 0;">Tanggal Diambil</p>
+                        <p id="detail-tgl-ambil" style="font-size: 0.875rem; font-weight: 600; color: #111827; margin: 0;"></p>
+                    </div>
+                    <div>
+                        <p style="font-size: 0.6875rem; color: #9ca3af; margin: 0 0 2px 0;">Petugas Penyerah</p>
+                        <p id="detail-petugas-serah" style="font-size: 0.875rem; font-weight: 600; color: #111827; margin: 0;"></p>
+                    </div>
+                </div>
+                <div style="background: #f9fafb; border-radius: 10px; padding: 12px;">
+                    <p style="font-size: 0.6875rem; color: #9ca3af; margin: 0 0 4px 0;">Bukti Kepemilikan</p>
+                    <p id="detail-bukti" style="font-size: 0.8125rem; color: #374151; margin: 0;"></p>
+                </div>
+            </div>
+
+            {{-- Timeline --}}
+            <div style="background: #eff6ff; border-radius: 12px; padding: 14px 16px;">
+                <p style="font-size: 0.8125rem; font-weight: 700; color: #1e40af; margin: 0 0 8px 0;">Timeline:</p>
+                <div id="detail-timeline" style="display: flex; flex-direction: column; gap: 4px;"></div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
 <script>
     function switchTab(tab) {
         ['laporan','barang','verifikasi'].forEach(t => {
@@ -553,6 +836,101 @@
         document.querySelectorAll('.barang-row').forEach(row => {
             row.style.display = row.dataset.nama.includes(val.toLowerCase()) ? 'grid' : 'none';
         });
+    }
+
+    function filterLaporan(val) {
+        document.querySelectorAll('.laporan-row').forEach(row => {
+            row.style.display = row.dataset.nama.includes(val.toLowerCase()) ? 'grid' : 'none';
+        });
+    }
+
+    function openSetujuiModal(id) {
+        document.getElementById('form-setujui').action = '/security/klaim/' + id + '/setujui';
+        document.getElementById('modal-setujui').style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    }
+
+    function previewPenyerahan(input) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('preview-penyerahan').src = e.target.result;
+                document.getElementById('preview-penyerahan-wrap').style.display = 'block';
+                document.getElementById('upload-penyerahan').style.display = 'none';
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    function hapusPenyerahan() {
+        document.getElementById('foto-penyerahan').value = '';
+        document.getElementById('preview-penyerahan-wrap').style.display = 'none';
+        document.getElementById('upload-penyerahan').style.display = 'flex';
+        document.getElementById('foto-penyerahan-label').textContent = 'Foto saat penyerahan barang';
+    }
+
+    const laporanData = @json($laporanJson);
+
+    function openDetailLaporan(id) {
+        const l = laporanData.find(x => x.id === id);
+        if (!l) return;
+
+        const year = new Date().getFullYear();
+        document.getElementById('detail-kode').textContent =
+            'Kode: LOST-' + year + '-' + String(id).padStart(3, '0');
+
+        document.getElementById('detail-nama').textContent       = l.judul;
+        document.getElementById('detail-kategori').textContent   = l.kategori;
+        document.getElementById('detail-deskripsi').textContent  = l.deskripsi;
+        document.getElementById('detail-pelapor').textContent    = l.pelapor;
+        document.getElementById('detail-nim').textContent        = l.nim;
+        document.getElementById('detail-kontak').textContent     = l.kontak;
+        document.getElementById('detail-lokasi').textContent     = l.lokasi;
+        document.getElementById('detail-tanggal-hilang').textContent = l.tanggal_hilang ?? '-';
+        document.getElementById('detail-tanggal-lapor').textContent  = l.created_at;
+        document.getElementById('detail-petugas-terima').textContent = '{{ auth()->user()->name }}';
+        document.getElementById('detail-ditemukan-oleh').textContent = 'Petugas Keamanan';
+
+        const statusMap = {
+            'menunggu' : { label: 'Dicari',       bg: '#fee2e2', color: '#dc2626' },
+            'disetujui': { label: 'Ditemukan',     bg: '#dbeafe', color: '#2563eb' },
+            'ditemukan': { label: 'Dikembalikan',  bg: '#dcfce7', color: '#16a34a' },
+            'ditutup'  : { label: 'Ditutup',       bg: '#111827', color: 'white'   },
+        };
+        const s = statusMap[l.status] ?? { label: l.status, bg: '#f3f4f6', color: '#374151' };
+        const badge = document.getElementById('detail-status-badge');
+        badge.textContent      = s.label;
+        badge.style.background = s.bg;
+        badge.style.color      = s.color;
+
+        const fotoWrap = document.getElementById('detail-foto-wrap');
+        fotoWrap.innerHTML = l.foto
+            ? `<img src="${l.foto}" style="width:100%; height:200px; object-fit:cover; border-radius:12px; border:1px solid #e5e7eb;">`
+            : '';
+
+        const pengembalian = document.getElementById('detail-pengembalian');
+        if (l.status === 'ditemukan') {
+            pengembalian.style.display = 'block';
+            document.getElementById('detail-tgl-ambil').textContent    = l.tanggal_hilang ?? '-';
+            document.getElementById('detail-petugas-serah').textContent = '{{ auth()->user()->name }}';
+            document.getElementById('detail-bukti').textContent         = l.deskripsi ?? '-';
+        } else {
+            pengembalian.style.display = 'none';
+        }
+
+        const timeline = document.getElementById('detail-timeline');
+        let tl = `<p style="font-size:0.8125rem; color:#1e40af; margin:0;">1. Dilaporkan hilang: ${l.created_at} di ${l.lokasi}</p>`;
+        tl += `<p style="font-size:0.8125rem; color:#1e40af; margin:0;">2. Diterima oleh: {{ auth()->user()->name }}</p>`;
+        if (l.status === 'disetujui' || l.status === 'ditemukan') {
+            tl += `<p style="font-size:0.8125rem; color:#1e40af; margin:0;">3. Ditemukan: ${l.tanggal_hilang} oleh Petugas Keamanan</p>`;
+        }
+        if (l.status === 'ditemukan') {
+            tl += `<p style="font-size:0.8125rem; color:#1e40af; margin:0;">4. Diserahkan: ${l.tanggal_hilang} oleh {{ auth()->user()->name }}</p>`;
+        }
+        timeline.innerHTML = tl;
+
+        document.getElementById('modal-detail-laporan').style.display = 'flex';
+        document.body.style.overflow = 'hidden';
     }
 </script>
 

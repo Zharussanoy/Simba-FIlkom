@@ -17,6 +17,9 @@ class BarangTemuan extends Model
         'foto',
         'status',
         'diklaim_oleh',
+        'petugas_penyerah', 
+        'foto_penyerahan', 
+        'tanggal_diserahkan',
     ];
 
     /*
