@@ -108,9 +108,9 @@
                                 {{ $laporan->judul }}
                             </p>
                             <p class="text-xs text-gray-500 mt-0.5">
-                                {{ $laporan->kategori ?? 'Lainnya' }}
+                                {{ $laporan->kategori->nama ?? 'Lainnya' }}  {{-- ← DIUBAH --}}
                                 @if($laporan->lokasi)
-                                    • {{ $laporan->lokasi->nama ?? $laporan->lokasi }}
+                                    • {{ $laporan->lokasi->nama ?? 'Lokasi tidak diketahui' }}  {{-- ← DIUBAH --}}
                                 @endif
                             </p>
                             <p class="text-xs text-gray-400 mt-0.5">

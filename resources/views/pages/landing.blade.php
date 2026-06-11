@@ -7,17 +7,11 @@
                 height: 100%; display: flex; align-items: center; justify-content: space-between;">
 
         {{-- Logo --}}
+        {{-- LOGO KIRI di landing page --}}
         <div style="display: flex; align-items: center; gap: 8px;">
-            <div style="width: 32px; height: 32px; background: #2563eb; border-radius: 8px;
-                        display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                <svg style="width: 16px; height: 16px;" fill="none" stroke="white" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                          d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"/>
-                </svg>
-            </div>
-            <img src="{{ asset('images/logo-simba.png') }}" alt="SIMBA-FILKOM"
-                 style="height: 28px; object-fit: contain;"
-                 onerror="this.style.display='none'">
+            <img src="{{ asset('images/logo-simba.png') }}" alt="SIMBA"
+                style="height: 32px; object-fit: contain;">
+            <p style="font-size: 0.75rem; color: #9ca3af; margin: 0; line-height: 1;">FILKOM UB</p>
         </div>
 
         {{-- Tombol Masuk --}}
@@ -253,19 +247,14 @@
 <footer class="bg-gray-900 text-gray-400 py-10">
     <div class="max-w-5xl mx-auto px-4 text-center space-y-3">
 
-        <div class="flex items-center justify-center gap-2">
-            <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                          d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"/>
-                </svg>
-            </div>
-            <span class="text-white font-bold text-base">SIMBA-FILKOM</span>
+        {{-- Footer logo --}}
+        <div style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+            <img src="{{ asset('images/logo-simba.png') }}" alt="SIMBA"
+                style="height: 32px; object-fit: contain;">
+            <span style="color: white; font-weight: 700; font-size: 1rem;">SIMBA-FILKOM</span>
         </div>
-
         <p class="text-sm">Sistem Informasi Barang Hilang & Temuan</p>
         <p class="text-xs text-gray-500">© 2026 Fakultas Ilmu Komputer, Universitas Brawijaya</p>
-
     </div>
 </footer>
 

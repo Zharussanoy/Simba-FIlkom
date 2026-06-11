@@ -48,7 +48,8 @@ class BarangTemuanController extends Controller
         $barang = BarangTemuan::findOrFail($id);
 
         if ($barang->status !== 'tersedia') {
-            return redirect()->route('barang.show', $barang->id) ->with('error', 'Barang sudah tidak tersedia untuk diklaim.');
+            return redirect()->route('barang.show', $barang->id)
+                            ->with('error', 'Barang sudah tidak tersedia untuk diklaim.');
         }
 
         $request->validate([
@@ -65,6 +66,7 @@ class BarangTemuanController extends Controller
             'diklaim_oleh' => auth()->id(),
         ]);
 
-        return redirect()->route('barang.show', $barang->id) ->with('success', 'Klaim berhasil diajukan! Petugas keamanan akan memverifikasi bukti Anda.');
+        return redirect()->route('barang.show', $barang->id)
+                        ->with('success', 'Klaim berhasil diajukan! Petugas keamanan akan memverifikasi bukti Anda.');
     }
 }

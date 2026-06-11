@@ -244,6 +244,50 @@
                 </div>
             @endif
 
+            {{-- FOTO PENYERAHAN (hanya muncul kalau sudah diklaim) --}}
+            @if($status === 'diklaim' && $barang->foto_penyerahan)
+                <div style="background: white; border: 1px solid #e5e7eb; border-radius: 14px;
+                            padding: 20px; margin-bottom: 20px;">
+
+                    <h3 style="font-size: 1rem; font-weight: 700; color: #111827; margin: 0 0 4px 0;">
+                        Data Penyerahan
+                    </h3>
+                    <p style="font-size: 0.8125rem; color: #6b7280; margin: 0 0 16px 0;">
+                        Tercatat saat barang diserahkan ke pemilik
+                    </p>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+                        <div>
+                            <p style="font-size: 0.75rem; color: #9ca3af; margin: 0 0 2px 0;">Petugas Penyerah</p>
+                            <p style="font-size: 0.9375rem; font-weight: 600; color: #111827; margin: 0;">
+                                {{ $barang->petugas_penyerah ?? '-' }}
+                            </p>
+                        </div>
+                        <div>
+                            <p style="font-size: 0.75rem; color: #9ca3af; margin: 0 0 2px 0;">Tanggal Diserahkan</p>
+                            <p style="font-size: 0.9375rem; font-weight: 600; color: #111827; margin: 0;">
+                                {{ $barang->tanggal_diserahkan
+                                    ? \Carbon\Carbon::parse($barang->tanggal_diserahkan)->format('Y-m-d H:i')
+                                    : '-' }}
+                            </p>
+                        </div>
+                    </div>
+
+                    {{-- Foto penyerahan --}}
+                    <div>
+                        <p style="font-size: 0.75rem; color: #9ca3af; margin: 0 0 8px 0;">Foto Bukti Penyerahan</p>
+                        <img src="{{ Storage::url($barang->foto_penyerahan) }}"
+                            alt="Foto penyerahan"
+                            style="width: 100%; max-height: 280px; object-fit: cover;
+                                    border-radius: 12px; border: 1px solid #e5e7eb;">
+                        <p style="font-size: 0.75rem; color: #9ca3af; margin: 8px 0 0 0;">
+                            Foto ini diambil saat barang diserahkan oleh petugas keamanan sebagai bukti penyerahan.
+                        </p>
+                    </div>
+
+                </div>
+            @endif
+
             {{-- Tombol Klaim --}}
             @if($status === 'tersedia')
                 @auth

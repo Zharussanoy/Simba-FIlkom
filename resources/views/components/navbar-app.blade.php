@@ -3,18 +3,10 @@
         <div class="flex items-center justify-between h-14">
 
             {{-- LOGO & BRAND --}}
-            <div class="flex items-center gap-3">
-                <div class="w-9 h-9 bg-blue-600 rounded-xl flex items-center justify-center">
-                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"/>
-                    </svg>
-                </div>
-                <div>
-                    <img src="{{ asset('images/logo-simba.png') }}" alt="SIMBA" class="h-6 object-contain"
-                         onerror="this.style.display='none'">
-                    <p class="text-xs text-gray-400 leading-none mt-0.5">FILKOM UB</p>
-                </div>
+            <div class="flex items-center gap-2">
+                <img src="{{ asset('images/logo-simba.png') }}" alt="SIMBA" class="h-8 object-contain"
+                     onerror="this.style.display='none'">
+                <p class="text-xs text-gray-400 leading-none">FILKOM UB</p>
             </div>
 
             {{-- NAV LINKS --}}

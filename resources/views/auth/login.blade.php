@@ -5,18 +5,14 @@
             position: fixed; top: 0; left: 0; right: 0; z-index: 50; height: 56px;">
     <div style="max-width: 1024px; margin: 0 auto; padding: 0 16px;
                 height: 100%; display: flex; align-items: center; justify-content: space-between;">
+
+        {{-- LOGO KIRI --}}
         <div style="display: flex; align-items: center; gap: 8px;">
-            <div style="width: 32px; height: 32px; background: #2563eb; border-radius: 8px;
-                        display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                <svg style="width: 16px; height: 16px;" fill="none" stroke="white" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                          d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"/>
-                </svg>
-            </div>
-            <img src="{{ asset('images/logo-simba.png') }}" alt="SIMBA-FILKOM"
-                 style="height: 28px; object-fit: contain;"
-                 onerror="this.style.display='none'">
+            <img src="{{ asset('images/logo-simba.png') }}" alt="SIMBA"
+                 style="height: 32px; object-fit: contain;">
+            <p style="font-size: 0.75rem; color: #9ca3af; margin: 0; line-height: 1;">FILKOM UB</p>
         </div>
+
         <a href="{{ route('login') }}"
            style="background: #111827; color: white; font-size: 0.875rem;
                   padding: 8px 20px; border-radius: 8px; font-weight: 500; text-decoration: none;">
@@ -35,17 +31,12 @@
     <div style="background: white; border-radius: 20px; padding: 40px 36px;
                 width: 100%; max-width: 460px; box-shadow: 0 4px 24px rgba(0,0,0,0.06);">
 
-        {{-- Icon --}}
+        {{-- Logo dalam card --}}
         <div style="display: flex; justify-content: center; margin-bottom: 20px;">
-            <div style="width: 64px; height: 64px; background: #2563eb; border-radius: 16px;
-                        display: flex; align-items: center; justify-content: center;">
-                <svg style="width: 32px; height: 32px;" fill="none" stroke="white" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                          d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"/>
-                </svg>
-            </div>
+            <img src="{{ asset('images/logo-simba.png') }}" alt="SIMBA"
+                style="height: 72px; object-fit: contain;">
         </div>
-
+        
         {{-- Judul --}}
         <div style="text-align: center; margin-bottom: 28px;">
             <h1 style="font-size: 1.375rem; font-weight: 700; color: #111827; margin-bottom: 8px;">
