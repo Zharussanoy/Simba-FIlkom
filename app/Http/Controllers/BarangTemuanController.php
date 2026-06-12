@@ -57,9 +57,19 @@ class BarangTemuanController extends Controller
             'foto_bukti'        => 'nullable|image|max:2048',
         ]);
 
+        $fotoPath = null;
         if ($request->hasFile('foto_bukti')) {
-            $request->file('foto_bukti')->store('bukti-klaim', 'public');
+            $fotoPath = $request->file('foto_bukti')->store('bukti-klaim', 'public');
         }
+
+        // Simpan ke tabel klaim_barang
+        \App\Models\KlaimBarang::create([
+            'barang_temuan_id'  => $barang->id,
+            'user_id'           => auth()->id(),
+            'bukti_kepemilikan' => $request->bukti_kepemilikan,
+            'foto_bukti'        => $fotoPath,
+            'status'            => 'menunggu',
+        ]);
 
         $barang->update([
             'status'       => 'menunggu_verifikasi',

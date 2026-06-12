@@ -17,21 +17,13 @@ class KlaimBarang extends Model
         'catatan_security',
     ];
 
-    /*
-    |--------------------------------------------------------------------------
-    | RELATION
-    |--------------------------------------------------------------------------
-    */
-
-    // Klaim milik barang temuan
     public function barang()
     {
         return $this->belongsTo(BarangTemuan::class, 'barang_temuan_id');
     }
 
-    // Klaim dibuat oleh user
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'user_id');
     }
 }

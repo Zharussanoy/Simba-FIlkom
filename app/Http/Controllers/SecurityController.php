@@ -5,50 +5,69 @@ namespace App\Http\Controllers;
 use App\Models\BarangTemuan;
 use App\Models\LaporanHilang;
 use App\Models\KategoriBarang;
+use App\Models\KlaimBarang; 
 use App\Models\Lokasi;
 use Illuminate\Http\Request;
 
 class SecurityController extends Controller
 {
     public function index(Request $request)
-{
-    $tab = $request->get('tab', 'laporan');
+    {
+        $tab = $request->get('tab', 'laporan');
 
-    $laporans = LaporanHilang::with(['user', 'kategori', 'lokasi'])->latest()->get();
+        $laporans = LaporanHilang::with(['user', 'kategori', 'lokasi'])->latest()->get();
 
-    $laporanJson = $laporans->map(function($l) {
-        return [
-            'id'             => $l->id,
-            'judul'          => $l->judul,
-            'kategori'       => $l->kategori->nama ?? '-',
-            'deskripsi'      => $l->deskripsi ?? '-',
-            'status'         => $l->status,
-            'pelapor'        => $l->user->name ?? '-',
-            'nim'            => $l->user->nim ?? '-',
-            'kontak'         => $l->user->nomor_kontak ?? '-',
-            'lokasi'         => $l->lokasi->nama ?? '-',
-            'tanggal_hilang' => $l->tanggal_hilang,
-            'created_at'     => $l->created_at->format('Y-m-d H:i'),
-            'foto'           => $l->foto ? \Storage::url($l->foto) : null,
-        ];
-    });
+        $laporanJson = $laporans->map(function($l) {
+            return [
+                'id'             => $l->id,
+                'judul'          => $l->judul,
+                'kategori'       => $l->kategori->nama ?? '-',
+                'deskripsi'      => $l->deskripsi ?? '-',
+                'status'         => $l->status,
+                'pelapor'        => $l->user->name ?? '-',
+                'nim'            => $l->user->nim ?? '-',
+                'kontak'         => $l->user->nomor_kontak ?? '-',
+                'lokasi'         => $l->lokasi->nama ?? '-',
+                'tanggal_hilang' => $l->tanggal_hilang,
+                'created_at'     => $l->created_at->format('Y-m-d H:i'),
+                'foto'           => $l->foto ? \Storage::url($l->foto) : null,
+            ];
+        });
 
-    return view('security.dashboard', [
-        'tab'          => $tab,
-        'totalLaporan' => LaporanHilang::where('status', 'menunggu')->count(),
-        'totalKlaim'   => BarangTemuan::where('status', 'menunggu_verifikasi')->count(),
-        'totalBarang'  => BarangTemuan::where('status', 'tersedia')->count(),
-        'totalKembali' => BarangTemuan::where('status', 'diklaim')
-                              ->whereMonth('updated_at', now()->month)->count(),
-        'laporans'     => $laporans,
-        'laporanJson'  => $laporanJson,
-        'barangs'      => BarangTemuan::with(['kategori', 'lokasi', 'user'])->latest()->get(),
-        'klaimPending' => BarangTemuan::with(['kategori', 'lokasi', 'pemilikKlaim'])
-                              ->where('status', 'menunggu_verifikasi')->latest()->get(),
-        'kategoris'    => KategoriBarang::all(),
-        'lokasis'      => Lokasi::all(),
-    ]);
-}
+        $barangs = BarangTemuan::with(['kategori', 'lokasi', 'user', 'pemilikKlaim'])->latest()->get();
+
+        $barangData = $barangs->map(function($b) {
+            return [
+                'id'           => $b->id,
+                'nama'         => $b->nama_barang,
+                'kategori'     => $b->kategori->nama ?? '-',
+                'deskripsi'    => $b->deskripsi ?? '-',
+                'status'       => $b->status,
+                'lokasi'       => $b->lokasi->nama ?? '-',
+                'created_at'   => \Carbon\Carbon::parse($b->created_at)->format('Y-m-d H:i'),
+                'foto'         => $b->foto ? \Storage::url($b->foto) : null,
+                'penemu'       => $b->user->name ?? 'Petugas Keamanan',
+                'diklaim_oleh' => $b->pemilikKlaim->name ?? null,
+            ];
+        });
+
+        return view('security.dashboard', [
+            'tab'          => $tab,
+            'totalLaporan' => LaporanHilang::where('status', 'menunggu')->count(),
+            'totalKlaim'   => BarangTemuan::where('status', 'menunggu_verifikasi')->count(),
+            'totalBarang'  => BarangTemuan::where('status', 'tersedia')->count(),
+            'totalKembali' => BarangTemuan::where('status', 'diklaim')
+                                  ->whereMonth('updated_at', now()->month)->count(),
+            'laporans'     => $laporans,
+            'laporanJson'  => $laporanJson,
+            'barangs'      => $barangs,
+            'barangData'   => $barangData,
+            'klaimPending' => KlaimBarang::with(['barang.kategori', 'barang.lokasi', 'user'])
+                      ->where('status', 'menunggu')->latest()->get(),
+            'kategoris'    => KategoriBarang::all(),
+            'lokasis'      => Lokasi::all(),
+        ]);
+    }
 
     public function storeBarang(Request $request)
     {

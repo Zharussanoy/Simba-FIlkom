@@ -328,17 +328,19 @@
                             {{ $bLabel }}
                         </span>
 
-                        <a href="{{ route('barang.show', $b->id) }}"
-                           style="color: #9ca3af; display: flex; align-items: center;"
-                           onmouseover="this.style.color='#374151'"
-                           onmouseout="this.style.color='#9ca3af'">
+                        {{-- GANTI: buka popup bukan redirect --}}
+                        <button onclick="openDetailBarang({{ $b->id }})"
+                                style="background: none; border: none; cursor: pointer;
+                                       color: #9ca3af; padding: 4px;"
+                                onmouseover="this.style.color='#374151'"
+                                onmouseout="this.style.color='#9ca3af'">
                             <svg style="width: 18px; height: 18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                       d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                       d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
                             </svg>
-                        </a>
+                        </button>
                     </div>
                 @empty
                     <div style="padding: 40px; text-align: center;">
@@ -353,46 +355,44 @@
     <div id="tab-verifikasi" style="display: {{ $tab === 'verifikasi' ? 'block' : 'none' }};">
         <div style="display: flex; flex-direction: column; gap: 16px;">
             @forelse($klaimPending as $klaim)
+                @php $barang = $klaim->barang; @endphp
                 <div style="background: white; border: 1px solid #e5e7eb; border-radius: 16px; padding: 24px;">
 
                     <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;">
                         <div>
                             <h3 style="font-size: 1.0625rem; font-weight: 700; color: #111827; margin: 0 0 4px 0;">
-                                {{ $klaim->nama_barang }}
+                                {{ $barang->nama_barang }}
                             </h3>
                             <p style="font-size: 0.8125rem; color: #6b7280; margin: 0 0 2px 0;">
                                 Diklaim oleh:
                                 <strong style="color: #2563eb;">
-                                    {{ $klaim->pemilikKlaim->name ?? '-' }}
-                                    @if($klaim->pemilikKlaim?->nim)
-                                        ({{ $klaim->pemilikKlaim->nim }})
+                                    {{ $klaim->user->name ?? '-' }}
+                                    @if($klaim->user?->nim)
+                                        ({{ $klaim->user->nim }})
                                     @endif
                                 </strong>
                             </p>
                             <p style="font-size: 0.75rem; color: #9ca3af; margin: 0;">
-                                Kode: SIMBA-{{ date('Y') }}-{{ str_pad($klaim->id, 3, '0', STR_PAD_LEFT) }} •
-                                {{ \Carbon\Carbon::parse($klaim->updated_at)->format('Y-m-d H:i') }}
+                                Kode: SIMBA-{{ date('Y') }}-{{ str_pad($barang->id, 3, '0', STR_PAD_LEFT) }} •
+                                {{ \Carbon\Carbon::parse($klaim->created_at)->format('Y-m-d H:i') }}
                             </p>
                         </div>
                         <span style="font-size: 0.75rem; font-weight: 600; padding: 5px 12px;
-                                     border-radius: 999px; background: #fef3c7; color: #d97706;
-                                     display: flex; align-items: center; gap: 5px;">
-                            <svg style="width: 12px; height: 12px;" fill="none" stroke="#f59e0b" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                            </svg>
+                                    border-radius: 999px; background: #fef3c7; color: #d97706;
+                                    display: flex; align-items: center; gap: 5px;">
                             Pending
                         </span>
                     </div>
 
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                        {{-- Foto Barang --}}
                         <div>
                             <p style="font-size: 0.8125rem; font-weight: 600; color: #374151; margin: 0 0 10px 0;">
                                 Foto Barang
                             </p>
-                            @if($klaim->foto)
-                                <img src="{{ Storage::url($klaim->foto) }}"
-                                     style="width: 100%; height: 200px; object-fit: cover;
+                            @if($barang->foto)
+                                <img src="{{ Storage::url($barang->foto) }}"
+                                    style="width: 100%; height: 200px; object-fit: cover;
                                             border-radius: 12px; border: 1px solid #e5e7eb;">
                             @else
                                 <div style="width: 100%; height: 200px; background: #f9fafb;
@@ -402,50 +402,50 @@
                                 </div>
                             @endif
                             <p style="font-size: 0.75rem; color: #9ca3af; margin: 8px 0 0 0;">
-                                Lokasi: {{ $klaim->lokasi->nama ?? '-' }}
+                                Lokasi: {{ $barang->lokasi->nama ?? '-' }}
                             </p>
                         </div>
+
+                        {{-- Bukti Kepemilikan --}}
                         <div>
                             <p style="font-size: 0.8125rem; font-weight: 600; color: #374151; margin: 0 0 10px 0;">
                                 Bukti Kepemilikan
                             </p>
-                            <div style="width: 100%; min-height: 200px; background: #f9fafb;
-                                        border-radius: 12px; border: 1px solid #e5e7eb; padding: 16px;
-                                        box-sizing: border-box;">
+                            {{-- Foto bukti kalau ada --}}
+                            @if($klaim->foto_bukti)
+                                <img src="{{ Storage::url($klaim->foto_bukti) }}"
+                                    style="width: 100%; height: 140px; object-fit: cover;
+                                            border-radius: 10px; border: 1px solid #e5e7eb; margin-bottom: 10px;">
+                            @endif
+                            <div style="width: 100%; min-height: {{ $klaim->foto_bukti ? '60px' : '200px' }};
+                                        background: #f9fafb; border-radius: 12px;
+                                        border: 1px solid #e5e7eb; padding: 16px; box-sizing: border-box;">
                                 <p style="font-size: 0.8125rem; color: #6b7280; line-height: 1.7; margin: 0;">
-                                    {{ $klaim->deskripsi ?? 'Tidak ada deskripsi' }}
+                                    {{ $klaim->bukti_kepemilikan ?? 'Tidak ada keterangan' }}
                                 </p>
                             </div>
                         </div>
                     </div>
 
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-                        <button onclick="openSetujuiModal({{ $klaim->id }})"
+                        <button onclick="openSetujuiModal({{ $barang->id }})"
                                 style="width: 100%; padding: 13px; background: #111827; color: white;
-                                       font-size: 0.9375rem; font-weight: 700; border: none;
-                                       border-radius: 12px; cursor: pointer; display: flex;
-                                       align-items: center; justify-content: center; gap: 8px;"
+                                    font-size: 0.9375rem; font-weight: 700; border: none;
+                                    border-radius: 12px; cursor: pointer; display: flex;
+                                    align-items: center; justify-content: center; gap: 8px;"
                                 onmouseover="this.style.background='#374151'"
                                 onmouseout="this.style.background='#111827'">
-                            <svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                            </svg>
                             Setujui Klaim
                         </button>
-                        <form method="POST" action="{{ route('security.klaim.tolak', $klaim->id) }}">
+                        <form method="POST" action="{{ route('security.klaim.tolak', $barang->id) }}">
                             @csrf
                             <button type="submit"
                                     style="width: 100%; padding: 13px; background: #ef4444; color: white;
-                                           font-size: 0.9375rem; font-weight: 700; border: none;
-                                           border-radius: 12px; cursor: pointer; display: flex;
-                                           align-items: center; justify-content: center; gap: 8px;"
+                                        font-size: 0.9375rem; font-weight: 700; border: none;
+                                        border-radius: 12px; cursor: pointer; display: flex;
+                                        align-items: center; justify-content: center; gap: 8px;"
                                     onmouseover="this.style.background='#dc2626'"
                                     onmouseout="this.style.background='#ef4444'">
-                                <svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                          d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                </svg>
                                 Tolak Klaim
                             </button>
                         </form>
@@ -688,7 +688,7 @@
 <div id="modal-detail-laporan"
      style="display: none; position: fixed; inset: 0; z-index: 100;
             background: rgba(0,0,0,0.5); align-items: center; justify-content: center; padding: 24px;"
-     onclick="if(event.target===this) this.style.display='none'">
+     onclick="if(event.target===this){ this.style.display='none'; document.body.style.overflow=''; }">
 
     <div style="background: white; border-radius: 20px; width: 100%; max-width: 520px;
                 max-height: 88vh; overflow-y: auto;">
@@ -709,11 +709,9 @@
         </div>
 
         <div style="padding: 20px 24px;">
-
             <div id="detail-foto-wrap" style="margin-bottom: 20px;"></div>
 
             <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 20px;">
-
                 <div>
                     <p style="font-size: 0.8125rem; font-weight: 700; color: #111827; margin: 0 0 12px 0;">📦 Data Barang</p>
                     <div style="display: flex; flex-direction: column; gap: 10px;">
@@ -737,7 +735,6 @@
                         </div>
                     </div>
                 </div>
-
                 <div>
                     <p style="font-size: 0.8125rem; font-weight: 700; color: #111827; margin: 0 0 12px 0;">👤 Data Pelapor</p>
                     <div style="display: flex; flex-direction: column; gap: 10px;">
@@ -763,7 +760,6 @@
                         </div>
                     </div>
                 </div>
-
                 <div>
                     <p style="font-size: 0.8125rem; font-weight: 700; color: #111827; margin: 0 0 12px 0;">📍 Lokasi & Waktu</p>
                     <div style="display: flex; flex-direction: column; gap: 10px;">
@@ -781,10 +777,8 @@
                         </div>
                     </div>
                 </div>
-
             </div>
 
-            {{-- Data Pengembalian --}}
             <div id="detail-pengembalian"
                  style="display: none; border-top: 1px solid #f3f4f6; padding-top: 16px; margin-bottom: 16px;">
                 <p style="font-size: 0.8125rem; font-weight: 700; color: #111827; margin: 0 0 12px 0;">
@@ -806,10 +800,110 @@
                 </div>
             </div>
 
-            {{-- Timeline --}}
             <div style="background: #eff6ff; border-radius: 12px; padding: 14px 16px;">
                 <p style="font-size: 0.8125rem; font-weight: 700; color: #1e40af; margin: 0 0 8px 0;">Timeline:</p>
                 <div id="detail-timeline" style="display: flex; flex-direction: column; gap: 4px;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{-- ===== MODAL DETAIL BARANG TEMUAN ===== --}}
+<div id="modal-detail-barang"
+     style="display: none; position: fixed; inset: 0; z-index: 100;
+            background: rgba(0,0,0,0.5); align-items: center; justify-content: center; padding: 24px;"
+     onclick="if(event.target===this){ this.style.display='none'; document.body.style.overflow=''; }">
+
+    <div style="background: white; border-radius: 20px; width: 100%; max-width: 480px;
+                max-height: 88vh; overflow-y: auto;">
+
+        <div style="padding: 20px 24px 16px; border-bottom: 1px solid #f3f4f6;
+                    display: flex; justify-content: space-between; align-items: center;
+                    position: sticky; top: 0; background: white; z-index: 10;
+                    border-radius: 20px 20px 0 0;">
+            <div>
+                <h2 style="font-size: 1rem; font-weight: 700; color: #111827; margin: 0 0 2px 0;">
+                    Detail Barang Temuan
+                </h2>
+                <p id="db-kode" style="font-size: 0.75rem; color: #9ca3af; margin: 0;"></p>
+            </div>
+            <button onclick="document.getElementById('modal-detail-barang').style.display='none'; document.body.style.overflow='';"
+                    style="background: #f3f4f6; border: none; cursor: pointer; color: #6b7280;
+                           width: 28px; height: 28px; border-radius: 999px; font-size: 0.875rem; flex-shrink: 0;">✕</button>
+        </div>
+
+        <div style="padding: 20px 24px;">
+
+            <div id="db-foto-wrap" style="margin-bottom: 20px;"></div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                <div>
+                    <p style="font-size: 0.875rem; font-weight: 700; color: #111827; margin: 0 0 12px 0;">
+                        Informasi Barang
+                    </p>
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                        <div>
+                            <p style="font-size: 0.6875rem; color: #9ca3af; margin: 0 0 2px 0;">Nama Barang</p>
+                            <p id="db-nama" style="font-size: 0.875rem; font-weight: 600; color: #111827; margin: 0;"></p>
+                        </div>
+                        <div>
+                            <p style="font-size: 0.6875rem; color: #9ca3af; margin: 0 0 2px 0;">Kategori</p>
+                            <p id="db-kategori" style="font-size: 0.875rem; color: #374151; margin: 0;"></p>
+                        </div>
+                        <div>
+                            <p style="font-size: 0.6875rem; color: #9ca3af; margin: 0 0 2px 0;">Deskripsi</p>
+                            <p id="db-deskripsi" style="font-size: 0.875rem; color: #374151; margin: 0; line-height: 1.5;"></p>
+                        </div>
+                        <div>
+                            <p style="font-size: 0.6875rem; color: #9ca3af; margin: 0 0 4px 0;">Status</p>
+                            <span id="db-status-badge"
+                                  style="font-size: 0.75rem; font-weight: 600; padding: 3px 10px;
+                                         border-radius: 999px; display: inline-block;"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <p style="font-size: 0.875rem; font-weight: 700; color: #111827; margin: 0 0 12px 0;">
+                        Waktu & Lokasi
+                    </p>
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                        <div>
+                            <p style="font-size: 0.6875rem; color: #9ca3af; margin: 0 0 2px 0;">Lokasi Ditemukan</p>
+                            <p id="db-lokasi" style="font-size: 0.875rem; font-weight: 600; color: #111827; margin: 0;"></p>
+                        </div>
+                        <div>
+                            <p style="font-size: 0.6875rem; color: #9ca3af; margin: 0 0 2px 0;">Tanggal & Waktu</p>
+                            <p id="db-tanggal" style="font-size: 0.875rem; color: #374151; margin: 0;"></p>
+                        </div>
+                        <div>
+                            <p style="font-size: 0.6875rem; color: #9ca3af; margin: 0 0 2px 0;">Oleh</p>
+                            <p id="db-penemu" style="font-size: 0.875rem; color: #374151; margin: 0;"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Data Pelapor / Pengklaim muncul kalau sudah diklaim --}}
+            <div id="db-pelapor-section"
+                 style="display: none; border-top: 1px solid #f3f4f6; padding-top: 16px;">
+                <p style="font-size: 0.875rem; font-weight: 700; color: #111827; margin: 0 0 12px 0;">
+                    Data Pelapor
+                </p>
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <div>
+                        <p style="font-size: 0.6875rem; color: #9ca3af; margin: 0 0 2px 0;">Nama Pelapor</p>
+                        <p id="db-diklaim-oleh" style="font-size: 0.875rem; font-weight: 600; color: #111827; margin: 0;"></p>
+                    </div>
+                    <div>
+                        <p style="font-size: 0.6875rem; color: #9ca3af; margin: 0 0 2px 0;">Kontak</p>
+                        <p id="db-kontak" style="font-size: 0.875rem; color: #374151; margin: 0;"></p>
+                    </div>
+                    <div>
+                        <p style="font-size: 0.6875rem; color: #9ca3af; margin: 0 0 2px 0;">Petugas Penerima</p>
+                        <p id="db-petugas-serah" style="font-size: 0.875rem; color: #374151; margin: 0;"></p>
+                    </div>
+                </div>
             </div>
 
         </div>
@@ -871,6 +965,54 @@
 
     const laporanData = @json($laporanJson);
 
+    const barangData = @json($barangData);
+
+    function openDetailBarang(id) {
+        const b = barangData.find(x => x.id === id);
+        if (!b) return;
+
+        const year = new Date().getFullYear();
+        document.getElementById('db-kode').textContent =
+            'Kode: SIMBA-' + year + '-' + String(id).padStart(3, '0');
+
+        document.getElementById('db-nama').textContent      = b.nama;
+        document.getElementById('db-kategori').textContent  = b.kategori;
+        document.getElementById('db-deskripsi').textContent = b.deskripsi;
+        document.getElementById('db-lokasi').textContent    = b.lokasi;
+        document.getElementById('db-tanggal').textContent   = b.created_at;
+        document.getElementById('db-penemu').textContent    = b.penemu;
+
+        const statusMap = {
+            'tersedia'            : { label: 'Tersedia',  bg: '#111827',  color: 'white'   },
+            'menunggu_verifikasi' : { label: 'Menunggu',  bg: '#fef3c7',  color: '#d97706' },
+            'diklaim'             : { label: 'Diklaim',   bg: '#dcfce7',  color: '#16a34a' },
+            'diarsipkan'          : { label: 'Diarsipkan',bg: '#f3f4f6',  color: '#374151' },
+        };
+        const s = statusMap[b.status] ?? { label: b.status, bg: '#f3f4f6', color: '#374151' };
+        const badge = document.getElementById('db-status-badge');
+        badge.textContent      = s.label;
+        badge.style.background = s.bg;
+        badge.style.color      = s.color;
+
+        const fotoWrap = document.getElementById('db-foto-wrap');
+        fotoWrap.innerHTML = b.foto
+            ? `<img src="${b.foto}" style="width:100%; height:220px; object-fit:cover; border-radius:12px; border:1px solid #e5e7eb;">`
+            : '';
+
+        const pelapor = document.getElementById('db-pelapor-section');
+        if (b.diklaim_oleh) {
+            pelapor.style.display = 'block';
+            document.getElementById('db-diklaim-oleh').textContent = b.diklaim_oleh;
+            document.getElementById('db-kontak').textContent       = b.kontak ?? '-';
+            document.getElementById('db-petugas-serah').textContent= b.petugas_penyerah ?? '-';
+        } else {
+            pelapor.style.display = 'none';
+        }
+
+        document.getElementById('modal-detail-barang').style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    }
+
     function openDetailLaporan(id) {
         const l = laporanData.find(x => x.id === id);
         if (!l) return;
@@ -911,7 +1053,7 @@
         const pengembalian = document.getElementById('detail-pengembalian');
         if (l.status === 'ditemukan') {
             pengembalian.style.display = 'block';
-            document.getElementById('detail-tgl-ambil').textContent    = l.tanggal_hilang ?? '-';
+            document.getElementById('detail-tgl-ambil').textContent     = l.tanggal_hilang ?? '-';
             document.getElementById('detail-petugas-serah').textContent = '{{ auth()->user()->name }}';
             document.getElementById('detail-bukti').textContent         = l.deskripsi ?? '-';
         } else {
