@@ -244,8 +244,8 @@
                 </div>
             @endif
 
-            {{-- FOTO PENYERAHAN (hanya muncul kalau sudah diklaim) --}}
-            @if($status === 'diklaim' && $barang->foto_penyerahan)
+            {{-- FOTO PENYERAHAN (hanya untuk security) --}}
+            @if($status === 'diklaim' && $barang->foto_penyerahan && auth()->user()?->role === 'security')
                 <div style="background: white; border: 1px solid #e5e7eb; border-radius: 14px;
                             padding: 20px; margin-bottom: 20px;">
 
@@ -292,11 +292,11 @@
             @if($status === 'tersedia')
                 @auth
                     <button onclick="openModal()"
-                            style="width: 100%; padding: 14px; background: #111827; color: white;
-                                   font-size: 1rem; font-weight: 700; border: none;
-                                   border-radius: 12px; cursor: pointer; margin-bottom: 32px;"
-                            onmouseover="this.style.background='#374151'"
-                            onmouseout="this.style.background='#111827'">
+                            style="width: 100%; padding: 14px; background: #2563eb; color: white;
+                                font-size: 1rem; font-weight: 700; border: none;
+                                border-radius: 12px; cursor: pointer; margin-bottom: 32px;"
+                            onmouseover="this.style.background='#1d4ed8'"
+                            onmouseout="this.style.background='#2563eb'">
                         Klaim Barang Ini
                     </button>
                 @else
@@ -432,11 +432,11 @@
             {{-- Tombol --}}
             <div style="display: flex; gap: 12px; align-items: center;">
                 <button type="submit"
-                        style="flex: 1; padding: 13px; background: #111827; color: white;
-                               font-size: 0.9375rem; font-weight: 700; border: none;
-                               border-radius: 12px; cursor: pointer;"
-                        onmouseover="this.style.background='#374151'"
-                        onmouseout="this.style.background='#111827'">
+                        style="flex: 1; padding: 13px; background: #2563eb; color: white;
+                            font-size: 0.9375rem; font-weight: 700; border: none;
+                            border-radius: 12px; cursor: pointer;"
+                        onmouseover="this.style.background='#1d4ed8'"
+                        onmouseout="this.style.background='#2563eb'">
                     Ajukan Klaim
                 </button>
                 <button type="button" onclick="closeModal()"

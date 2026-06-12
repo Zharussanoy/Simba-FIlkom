@@ -13,6 +13,10 @@ class BarangTemuanController extends Controller
     {
         $query = BarangTemuan::with(['lokasi', 'kategori'])->latest();
 
+        if (!$request->status) {
+            $query->whereIn('status', ['tersedia', 'diklaim']);
+        }
+
         if ($request->search) {
             $query->where('nama_barang', 'like', '%' . $request->search . '%');
         }
@@ -34,8 +38,7 @@ class BarangTemuanController extends Controller
             'kategoris' => KategoriBarang::all(),
             'lokasis'   => Lokasi::all(),
         ]);
-    }
-    
+    }   
 
     public function show($id)
     {

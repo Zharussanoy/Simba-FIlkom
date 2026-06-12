@@ -6,17 +6,19 @@
     <div style="max-width: 1024px; margin: 0 auto; padding: 0 16px;
                 height: 100%; display: flex; align-items: center; justify-content: space-between;">
 
-        {{-- LOGO KIRI --}}
         <div style="display: flex; align-items: center; gap: 8px;">
-            <img src="{{ asset('images/logo-simba.png') }}" alt="SIMBA"
+            <img src="{{ asset('images/logo-Simba.png') }}" alt="SIMBA"
                  style="height: 32px; object-fit: contain;">
             <p style="font-size: 0.75rem; color: #9ca3af; margin: 0; line-height: 1;">FILKOM UB</p>
         </div>
 
-        <a href="{{ route('login') }}"
-           style="background: #111827; color: white; font-size: 0.875rem;
-                  padding: 8px 20px; border-radius: 8px; font-weight: 500; text-decoration: none;">
-            Masuk
+        <a href="{{ route('home') }}"
+           style="background: #2563eb; color: white; font-size: 0.875rem;
+                  padding: 8px 20px; border-radius: 8px; font-weight: 500;
+                  text-decoration: none; transition: background 0.2s;"
+           onmouseover="this.style.background='#1d4ed8'"
+           onmouseout="this.style.background='#2563eb'">
+            Beranda
         </a>
     </div>
 </nav>
@@ -33,10 +35,10 @@
 
         {{-- Logo dalam card --}}
         <div style="display: flex; justify-content: center; margin-bottom: 20px;">
-            <img src="{{ asset('images/logo-simba.png') }}" alt="SIMBA"
+            <img src="{{ asset('images/logo-Simba.png') }}" alt="SIMBA"
                 style="height: 72px; object-fit: contain;">
         </div>
-        
+
         {{-- Judul --}}
         <div style="text-align: center; margin-bottom: 28px;">
             <h1 style="font-size: 1.375rem; font-weight: 700; color: #111827; margin-bottom: 8px;">
@@ -75,8 +77,8 @@
                 <button type="button" onclick="setRole('mahasiswa', this)"
                         id="tab-mahasiswa"
                         style="flex: 1; padding: 8px 12px; border-radius: 8px; font-size: 0.875rem;
-                               font-weight: 500; cursor: pointer; border: 1px solid #e5e7eb;
-                               background: #111827; color: white; transition: all 0.2s;">
+                               font-weight: 500; cursor: pointer; border: 1px solid #2563eb;
+                               background: #2563eb; color: white; transition: all 0.2s;">
                     Mahasiswa
                 </button>
                 <button type="button" onclick="setRole('security', this)"
@@ -115,11 +117,11 @@
             </div>
 
             <button type="submit"
-                    style="width: 100%; padding: 13px; background: #111827; color: white;
+                    style="width: 100%; padding: 13px; background: #2563eb; color: white;
                            font-size: 0.9375rem; font-weight: 600; border: none;
                            border-radius: 12px; cursor: pointer; transition: background 0.2s;"
-                    onmouseover="this.style.background='#374151'"
-                    onmouseout="this.style.background='#111827'">
+                    onmouseover="this.style.background='#1d4ed8'"
+                    onmouseout="this.style.background='#2563eb'">
                 Masuk
             </button>
         </form>
@@ -168,10 +170,12 @@
             const btn = document.getElementById('tab-' + r);
             btn.style.background = 'white';
             btn.style.color = '#374151';
+            btn.style.borderColor = '#e5e7eb';
         });
 
-        el.style.background = '#111827';
+        el.style.background = '#2563eb';
         el.style.color = 'white';
+        el.style.borderColor = '#2563eb';
 
         document.getElementById('selected-role').value = role;
         document.getElementById('input-email').placeholder = placeholders[role];

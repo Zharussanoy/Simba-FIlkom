@@ -313,11 +313,11 @@
             {{-- TOMBOL --}}
             <div style="display: flex; gap: 12px; align-items: center;">
                 <button type="submit"
-                        style="flex: 1; padding: 14px; background: #111827; color: white;
-                               font-size: 1rem; font-weight: 700; border: none;
-                               border-radius: 12px; cursor: pointer; transition: background 0.2s;"
-                        onmouseover="this.style.background='#374151'"
-                        onmouseout="this.style.background='#111827'">
+                        style="flex: 1; padding: 14px; background: #2563eb; color: white;
+                            font-size: 1rem; font-weight: 700; border: none;
+                            border-radius: 12px; cursor: pointer; transition: background 0.2s;"
+                        onmouseover="this.style.background='#1d4ed8'"
+                        onmouseout="this.style.background='#2563eb'">
                     Kirim Laporan
                 </button>
                 <a href="{{ route('dashboard') }}"

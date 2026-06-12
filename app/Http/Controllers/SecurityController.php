@@ -38,16 +38,22 @@ class SecurityController extends Controller
 
         $barangData = $barangs->map(function($b) {
             return [
-                'id'           => $b->id,
-                'nama'         => $b->nama_barang,
-                'kategori'     => $b->kategori->nama ?? '-',
-                'deskripsi'    => $b->deskripsi ?? '-',
-                'status'       => $b->status,
-                'lokasi'       => $b->lokasi->nama ?? '-',
-                'created_at'   => \Carbon\Carbon::parse($b->created_at)->format('Y-m-d H:i'),
-                'foto'         => $b->foto ? \Storage::url($b->foto) : null,
-                'penemu'       => $b->user->name ?? 'Petugas Keamanan',
-                'diklaim_oleh' => $b->pemilikKlaim->name ?? null,
+                'id'                => $b->id,
+                'nama'              => $b->nama_barang,
+                'kategori'          => $b->kategori->nama ?? '-',
+                'deskripsi'         => $b->deskripsi ?? '-',
+                'status'            => $b->status,
+                'lokasi'            => $b->lokasi->nama ?? '-',
+                'created_at'        => \Carbon\Carbon::parse($b->created_at)->format('Y-m-d H:i'),
+                'foto'              => $b->foto ? \Storage::url($b->foto) : null,
+                'penemu'            => $b->user->name ?? 'Petugas Keamanan',
+                'diklaim_oleh'      => $b->pemilikKlaim->name ?? null,
+                'kontak'            => $b->pemilikKlaim->nomor_kontak ?? null,
+                'petugas_penyerah'  => $b->petugas_penyerah ?? null,
+                'foto_penyerahan'   => $b->foto_penyerahan ? \Storage::url($b->foto_penyerahan) : null,
+                'tanggal_diserahkan'=> $b->tanggal_diserahkan
+                                        ? \Carbon\Carbon::parse($b->tanggal_diserahkan)->format('Y-m-d H:i')
+                                        : null,
             ];
         });
 
@@ -119,6 +125,11 @@ class SecurityController extends Controller
             'tanggal_diserahkan' => now(),
         ]);
 
+        // Update status di tabel klaim_barang juga
+        KlaimBarang::where('barang_temuan_id', $barang->id)
+            ->where('status', 'menunggu')
+            ->update(['status' => 'disetujui']);
+
         return redirect()->route('security.dashboard', ['tab' => 'verifikasi'])
                         ->with('success', 'Klaim berhasil disetujui dan barang telah diserahkan!');
     }
@@ -126,12 +137,18 @@ class SecurityController extends Controller
     public function tolakKlaim($id)
     {
         $barang = BarangTemuan::findOrFail($id);
+
+        // Update status di tabel klaim_barang juga
+        KlaimBarang::where('barang_temuan_id', $barang->id)
+            ->where('status', 'menunggu')
+            ->update(['status' => 'ditolak']);
+
         $barang->update([
             'status'       => 'tersedia',
             'diklaim_oleh' => null,
         ]);
 
         return redirect()->route('security.dashboard', ['tab' => 'verifikasi'])
-                         ->with('error', 'Klaim ditolak, barang kembali tersedia.');
+                        ->with('error', 'Klaim ditolak, barang kembali tersedia.');
     }
 }

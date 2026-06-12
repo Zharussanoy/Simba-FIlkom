@@ -139,14 +139,13 @@
 
             {{-- Edit Profil --}}
             <button onclick="document.getElementById('modal-edit').style.display='flex'"
-                    style="width: 100%; margin-top: 20px; padding: 10px; background: #f9fafb;
-                           border: 1px solid #e5e7eb; border-radius: 10px; font-size: 0.875rem;
-                           font-weight: 500; color: #374151; cursor: pointer; transition: background 0.2s;"
-                    onmouseover="this.style.background='#f3f4f6'"
-                    onmouseout="this.style.background='#f9fafb'">
+                    style="width: 100%; margin-top: 20px; padding: 10px; background: #2563eb;
+                        border: none; border-radius: 10px; font-size: 0.875rem;
+                        font-weight: 500; color: white; cursor: pointer; transition: background 0.2s;"
+                    onmouseover="this.style.background='#1d4ed8'"
+                    onmouseout="this.style.background='#2563eb'">
                 Edit Profil
             </button>
-
         </div>
 
         {{-- KOLOM KANAN --}}
@@ -359,11 +358,11 @@
 
             <div style="display: flex; gap: 12px;">
                 <button type="submit"
-                        style="flex: 1; padding: 12px; background: #111827; color: white;
-                               font-size: 0.9375rem; font-weight: 700; border: none;
-                               border-radius: 12px; cursor: pointer;"
-                        onmouseover="this.style.background='#374151'"
-                        onmouseout="this.style.background='#111827'">
+                        style="flex: 1; padding: 12px; background: #2563eb; color: white;
+                            font-size: 0.9375rem; font-weight: 700; border: none;
+                            border-radius: 12px; cursor: pointer;"
+                        onmouseover="this.style.background='#1d4ed8'"
+                        onmouseout="this.style.background='#2563eb'">
                     Simpan
                 </button>
                 <button type="button"

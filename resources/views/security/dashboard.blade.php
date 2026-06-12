@@ -64,10 +64,10 @@
 
         <button onclick="document.getElementById('modal-input').style.display='flex'"
                 style="display: inline-flex; align-items: center; gap: 8px;
-                       background: #111827; color: white; font-size: 0.875rem; font-weight: 600;
-                       padding: 10px 18px; border-radius: 12px; border: none; cursor: pointer;"
-                onmouseover="this.style.background='#374151'"
-                onmouseout="this.style.background='#111827'">
+                    background: #2563eb; color: white; font-size: 0.875rem; font-weight: 600;
+                    padding: 10px 18px; border-radius: 12px; border: none; cursor: pointer;"
+                onmouseover="this.style.background='#1d4ed8'"
+                onmouseout="this.style.background='#2563eb'">
             <svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
             </svg>
@@ -429,12 +429,12 @@
 
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
                         <button onclick="openSetujuiModal({{ $barang->id }})"
-                                style="width: 100%; padding: 13px; background: #111827; color: white;
+                                style="width: 100%; padding: 13px; background: #2563eb; color: white;
                                     font-size: 0.9375rem; font-weight: 700; border: none;
                                     border-radius: 12px; cursor: pointer; display: flex;
                                     align-items: center; justify-content: center; gap: 8px;"
-                                onmouseover="this.style.background='#374151'"
-                                onmouseout="this.style.background='#111827'">
+                                onmouseover="this.style.background='#1d4ed8'"
+                                onmouseout="this.style.background='#2563eb'">
                             Setujui Klaim
                         </button>
                         <form method="POST" action="{{ route('security.klaim.tolak', $barang->id) }}">
@@ -570,11 +570,11 @@
 
             <div style="display: flex; gap: 12px;">
                 <button type="submit"
-                        style="flex: 1; padding: 12px; background: #111827; color: white;
-                               font-size: 0.9375rem; font-weight: 700; border: none;
-                               border-radius: 12px; cursor: pointer;"
-                        onmouseover="this.style.background='#374151'"
-                        onmouseout="this.style.background='#111827'">
+                        style="flex: 1; padding: 12px; background: #2563eb; color: white;
+                            font-size: 0.9375rem; font-weight: 700; border: none;
+                            border-radius: 12px; cursor: pointer;"
+                        onmouseover="this.style.background='#1d4ed8'"
+                        onmouseout="this.style.background='#2563eb'">
                     Simpan
                 </button>
                 <button type="button"
@@ -666,11 +666,11 @@
 
             <div style="display: flex; gap: 12px;">
                 <button type="submit"
-                        style="flex: 1; padding: 13px; background: #111827; color: white;
-                               font-size: 0.9375rem; font-weight: 700; border: none;
-                               border-radius: 12px; cursor: pointer;"
-                        onmouseover="this.style.background='#374151'"
-                        onmouseout="this.style.background='#111827'">
+                        style="flex: 1; padding: 13px; background: #2563eb; color: white;
+                            font-size: 0.9375rem; font-weight: 700; border: none;
+                            border-radius: 12px; cursor: pointer;"
+                        onmouseover="this.style.background='#1d4ed8'"
+                        onmouseout="this.style.background='#2563eb'">
                     Setujui
                 </button>
                 <button type="button"

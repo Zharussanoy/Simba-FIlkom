@@ -6,35 +6,30 @@
     <div style="max-width: 1024px; margin: 0 auto; padding: 0 16px;
                 height: 100%; display: flex; align-items: center; justify-content: space-between;">
 
-        {{-- Logo --}}
-        {{-- LOGO KIRI di landing page --}}
         <div style="display: flex; align-items: center; gap: 8px;">
-            <img src="{{ asset('images/logo-simba.png') }}" alt="SIMBA"
+            <img src="{{ asset('images/logo-Simba.png') }}" alt="SIMBA"
                 style="height: 32px; object-fit: contain;">
             <p style="font-size: 0.75rem; color: #9ca3af; margin: 0; line-height: 1;">FILKOM UB</p>
         </div>
 
-        {{-- Tombol Masuk --}}
         <a href="{{ route('login') }}"
-           style="background: #111827; color: white; font-size: 0.875rem;
+           style="background: #2563eb; color: white; font-size: 0.875rem;
                   padding: 8px 20px; border-radius: 8px; font-weight: 500;
                   text-decoration: none; transition: background 0.2s;"
-           onmouseover="this.style.background='#374151'"
-           onmouseout="this.style.background='#111827'">
+           onmouseover="this.style.background='#1d4ed8'"
+           onmouseout="this.style.background='#2563eb'">
             Masuk
         </a>
 
     </div>
 </nav>
 
-{{-- Spacer navbar --}}
 <div style="height: 56px;"></div>
 
 {{-- HERO --}}
 <section style="background: #eff6ff; padding: 64px 16px 96px 16px;">
     <div style="max-width: 672px; margin: 0 auto; text-align: center;">
 
-        {{-- Badge --}}
         <div style="display: inline-flex; align-items: center; gap: 6px;
                     border: 1px solid #bfdbfe; background: white; color: #6b7280;
                     font-size: 0.75rem; padding: 6px 12px; border-radius: 999px;
@@ -61,11 +56,11 @@
         <div style="display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;">
             <a href="{{ route('login') }}"
                style="display: inline-flex; align-items: center; gap: 8px;
-                      background: #111827; color: white; font-size: 0.875rem;
+                      background: #2563eb; color: white; font-size: 0.875rem;
                       padding: 10px 20px; border-radius: 12px; font-weight: 500;
                       text-decoration: none; transition: background 0.2s;"
-               onmouseover="this.style.background='#374151'"
-               onmouseout="this.style.background='#111827'">
+               onmouseover="this.style.background='#1d4ed8'"
+               onmouseout="this.style.background='#2563eb'">
                 <svg style="width: 16px; height: 16px; flex-shrink: 0;"
                      fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -202,9 +197,7 @@
                                 background: rgba(255,255,255,0.2); color: white;
                                 font-size: 1.125rem; font-weight: 700;
                                 display: flex; align-items: center; justify-content: center;
-                                margin: 0 auto 16px auto; flex-shrink: 0;">
-                        1
-                    </div>
+                                margin: 0 auto 16px auto;">1</div>
                     <h3 style="font-weight: 700; color: white; margin-bottom: 8px;">Login dengan Akun UB</h3>
                     <p style="font-size: 0.875rem; color: #bfdbfe; line-height: 1.6;">
                         Gunakan Google SSO dengan akun Universitas Brawijaya
@@ -216,9 +209,7 @@
                                 background: rgba(255,255,255,0.2); color: white;
                                 font-size: 1.125rem; font-weight: 700;
                                 display: flex; align-items: center; justify-content: center;
-                                margin: 0 auto 16px auto; flex-shrink: 0;">
-                        2
-                    </div>
+                                margin: 0 auto 16px auto;">2</div>
                     <h3 style="font-weight: 700; color: white; margin-bottom: 8px;">Lapor atau Cari Barang</h3>
                     <p style="font-size: 0.875rem; color: #bfdbfe; line-height: 1.6;">
                         Laporkan barang hilang atau cari di katalog barang temuan
@@ -230,9 +221,7 @@
                                 background: rgba(255,255,255,0.2); color: white;
                                 font-size: 1.125rem; font-weight: 700;
                                 display: flex; align-items: center; justify-content: center;
-                                margin: 0 auto 16px auto; flex-shrink: 0;">
-                        3
-                    </div>
+                                margin: 0 auto 16px auto;">3</div>
                     <h3 style="font-weight: 700; color: white; margin-bottom: 8px;">Klaim & Ambil Barang</h3>
                     <p style="font-size: 0.875rem; color: #bfdbfe; line-height: 1.6;">
                         Verifikasi kepemilikan dan ambil barang di pos keamanan
@@ -243,13 +232,12 @@
         </div>
     </div>
 </section>
+
 {{-- FOOTER --}}
 <footer class="bg-gray-900 text-gray-400 py-10">
     <div class="max-w-5xl mx-auto px-4 text-center space-y-3">
-
-        {{-- Footer logo --}}
         <div style="display: flex; align-items: center; justify-content: center; gap: 8px;">
-            <img src="{{ asset('images/logo-simba.png') }}" alt="SIMBA"
+            <img src="{{ asset('images/logo-Simba.png') }}" alt="SIMBA"
                 style="height: 32px; object-fit: contain;">
             <span style="color: white; font-weight: 700; font-size: 1rem;">SIMBA-FILKOM</span>
         </div>

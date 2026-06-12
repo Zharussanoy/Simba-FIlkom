@@ -88,7 +88,7 @@
             </div>
 
             <div class="space-y-3">
-                @forelse($laporanTerbaru as $laporan)
+                @forelse($laporanSaya as $laporan)
                     <div class="flex items-center gap-4 p-3 rounded-xl border border-gray-100 hover:bg-gray-50 transition">
 
                         {{-- Thumbnail --}}
