@@ -24,7 +24,7 @@ dan mengklaim barang yang ditemukan oleh petugas keamanan.
 ## Cara Install
 
 ### 1. Clone repository
-git clone https://github.com/username/simba-filkom.git
+git clone https://github.com/Zharussanoy/Simba-FIlkom.git
 cd simba-filkom
 
 ### 2. Install dependencies
