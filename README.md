@@ -25,6 +25,7 @@ dan mengklaim barang yang ditemukan oleh petugas keamanan.
 
 ### 1. Clone repository
 git clone https://github.com/Zharussanoy/Simba-FIlkom.git
+
 cd simba-filkom
 
 ### 2. Install dependencies
@@ -37,7 +38,9 @@ php artisan key:generate
 
 ### 4. Atur database di .env
 DB_DATABASE=simba_db
+
 DB_USERNAME=root
+
 DB_PASSWORD=
 
 ### 5. Jalankan migrasi dan seeder
